@@ -1,11 +1,14 @@
 <?php
 
 use App\Http\Controllers\UnduhSuratController;
+use App\Livewire\Portal\DaftarPengajuan;
 use App\Livewire\Portal\Dashboard;
 use App\Livewire\Portal\OtpVerifikasi;
 use App\Livewire\Portal\PengajuanSuratForm;
 use App\Livewire\Portal\PortalLogin;
+use App\Livewire\Portal\ProfilSaya;
 use App\Livewire\Portal\RegistrasiForm;
+use App\Livewire\Portal\SuratTerbitWarga;
 use App\Livewire\Portal\TrackingStatus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -14,10 +17,6 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | Portal Warga (di luar panel Filament) — PRD §13
 |--------------------------------------------------------------------------
-|
-| Rute publik & area warga berbasis Blade + Livewire. Grup /portal/*
-| dilindungi middleware auth + role:warga (kecuali registrasi & login).
-|
 */
 
 // --- Rute publik: registrasi & login (tamu) ---
@@ -39,9 +38,12 @@ Route::post('/portal/logout', function () {
 // --- Area warga terproteksi ---
 Route::middleware(['auth', 'role:warga'])->group(function () {
     Route::get('/portal/dashboard', Dashboard::class)->name('portal.dashboard');
+    Route::get('/portal/pengajuan', DaftarPengajuan::class)->name('portal.pengajuan.index');
     Route::get('/portal/pengajuan/buat', PengajuanSuratForm::class)->name('portal.pengajuan.buat');
     Route::get('/portal/pengajuan/{pengajuan}/revisi', PengajuanSuratForm::class)->name('portal.pengajuan.revisi');
     Route::get('/portal/pengajuan/{pengajuan}/status', TrackingStatus::class)->name('portal.pengajuan.status');
+    Route::get('/portal/surat-terbit', SuratTerbitWarga::class)->name('portal.surat-terbit.index');
+    Route::get('/portal/profil', ProfilSaya::class)->name('portal.profil');
 });
 
 // Unduh file PDF surat via signed URL (kedaluwarsa 7 hari) — PRD §11.5 poin 6.

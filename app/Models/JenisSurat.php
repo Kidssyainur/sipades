@@ -15,7 +15,7 @@ class JenisSurat extends Model
 
     protected $fillable = [
         'kode', 'nama', 'deskripsi', 'persyaratan', 'field_formulir',
-        'template_view', 'estimasi_hari', 'is_active',
+        'template_view', 'estimasi_hari', 'jumlah_level_approval', 'butuh_tte_kades', 'is_active',
     ];
 
     protected function casts(): array
@@ -23,6 +23,8 @@ class JenisSurat extends Model
         return [
             'persyaratan' => 'array',
             'field_formulir' => 'array',
+            'jumlah_level_approval' => 'integer',
+            'butuh_tte_kades' => 'boolean',
             'is_active' => 'boolean',
         ];
     }
@@ -37,6 +39,6 @@ class JenisSurat extends Model
         return LogOptions::defaults()
             ->logOnly(['kode', 'nama', 'estimasi_hari', 'is_active'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+            ->dontLogEmptyChanges();
     }
 }

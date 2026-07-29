@@ -11,7 +11,7 @@ class SuratTerbit extends Model
 
     protected $fillable = [
         'pengajuan_surat_id', 'nomor_surat', 'diterbitkan_oleh',
-        'file_path', 'tanggal_terbit',
+        'file_path', 'tte_token', 'qr_code_path', 'tanggal_terbit',
     ];
 
     protected function casts(): array

@@ -17,6 +17,8 @@ return new class extends Migration
             $table->json('field_formulir')->nullable();  // definisi field dinamis formulir
             $table->string('template_view', 100)->nullable(); // nama blade template surat, ex: 'surat.domisili'
             $table->unsignedTinyInteger('estimasi_hari')->default(3);
+            $table->unsignedTinyInteger('jumlah_level_approval')->default(3); // 1, 2, atau 3 level
+            $table->boolean('butuh_tte_kades')->default(true);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

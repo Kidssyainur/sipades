@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\VerifikasiSuratController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -12,3 +13,6 @@ Route::get('/', function () {
 
     return redirect()->route('portal.login');
 });
+
+// Route publik verifikasi keabsahan TTE dokumen resmi
+Route::get('/verifikasi-surat/{token}', VerifikasiSuratController::class)->name('surat.verifikasi');

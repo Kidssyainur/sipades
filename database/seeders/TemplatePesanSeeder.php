@@ -11,34 +11,39 @@ class TemplatePesanSeeder extends Seeder
     {
         $templates = [
             [
+                'kode' => 'OTP_REGISTRASI',
+                'judul' => 'Kode OTP Registrasi Warga',
+                'isi_template' => 'Kode OTP verifikasi registrasi akun SIPADES Desa Karduluk Anda adalah: {otp}. Berlaku selama 5 menit. Jangan berikan kode ini kepada siapapun.',
+            ],
+            [
                 'kode' => 'PENGAJUAN_DITERIMA',
                 'judul' => 'Pengajuan Diterima',
-                'isi_template' => "Halo {nama}, pengajuan {jenis_surat} Anda dengan nomor referensi {nomor_referensi} telah kami terima dan sedang diproses. Terima kasih.",
+                'isi_template' => 'Halo {nama}, pengajuan {jenis_surat} Anda dengan nomor referensi {nomor_referensi} telah kami terima dan sedang diproses. Terima kasih.',
             ],
             [
                 'kode' => 'REVISI_DIMINTA',
                 'judul' => 'Revisi Diminta',
-                'isi_template' => "Halo {nama}, pengajuan {jenis_surat} ({nomor_referensi}) memerlukan revisi. Catatan: {catatan}. Silakan perbaiki melalui portal.",
+                'isi_template' => 'Halo {nama}, pengajuan {jenis_surat} ({nomor_referensi}) memerlukan revisi. Catatan: {catatan}. Silakan perbaiki melalui portal.',
             ],
             [
                 'kode' => 'DITOLAK',
                 'judul' => 'Pengajuan Ditolak',
-                'isi_template' => "Halo {nama}, mohon maaf pengajuan {jenis_surat} ({nomor_referensi}) ditolak. Alasan: {alasan}.",
+                'isi_template' => 'Halo {nama}, mohon maaf pengajuan {jenis_surat} ({nomor_referensi}) ditolak. Alasan: {catatan}.',
             ],
             [
                 'kode' => 'DISETUJUI_PETUGAS',
                 'judul' => 'Disetujui Petugas',
-                'isi_template' => "Halo {nama}, pengajuan {jenis_surat} ({nomor_referensi}) telah diverifikasi petugas dan diteruskan ke Sekretaris Desa.",
+                'isi_template' => 'Halo {nama}, pengajuan {jenis_surat} ({nomor_referensi}) telah diverifikasi petugas dan diteruskan ke Sekretaris Desa.',
             ],
             [
                 'kode' => 'DISETUJUI_SEKRETARIS',
                 'judul' => 'Disetujui Sekretaris',
-                'isi_template' => "Halo {nama}, pengajuan {jenis_surat} ({nomor_referensi}) telah disetujui Sekretaris Desa dan menunggu tanda tangan Kepala Desa.",
+                'isi_template' => 'Halo {nama}, pengajuan {jenis_surat} ({nomor_referensi}) telah disetujui Sekretaris Desa dan menunggu tanda tangan Kepala Desa.',
             ],
             [
                 'kode' => 'SURAT_TERBIT',
                 'judul' => 'Surat Terbit',
-                'isi_template' => "Halo {nama}, {jenis_surat} Anda telah terbit dengan nomor {nomor_surat}. Unduh di sini (berlaku 7 hari): {tautan}",
+                'isi_template' => 'Halo {nama}, {jenis_surat} Anda telah terbit dengan nomor {nomor_surat}. Unduh di sini (berlaku 7 hari): {tautan}',
             ],
         ];
 

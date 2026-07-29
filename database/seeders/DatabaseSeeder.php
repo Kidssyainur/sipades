@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             JenisSuratSeeder::class,
             AkunAwalSeeder::class,
             DataKependudukanSeeder::class,
+            LaporanDummySeeder::class,
         ]);
     }
 }

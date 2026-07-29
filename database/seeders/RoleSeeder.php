@@ -13,52 +13,56 @@ class RoleSeeder extends Seeder
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        // Permission approval kustom (di luar bawaan Shield) — PRD §10.
-        $permissionsKustom = ['approve_level_1', 'approve_level_2', 'approve_level_3_sign'];
-        foreach ($permissionsKustom as $permission) {
+        // 1. Permission approval kustom (di luar bawaan Shield) — PRD §10.
+        $permissionsKustom = [
+            'approve_level_1',
+            'approve_level_2',
+            'approve_level_3_sign',
+        ];
+
+        // 2. Permission standar Resource & Pages Filament
+        $resources = ['PengajuanSurat', 'JenisSurat', 'User', 'SuratTerbit', 'TemplatePesan', 'NotifikasiLog', 'Activity'];
+        $actions = ['ViewAny', 'View', 'Create', 'Update', 'Delete'];
+        
+        $resourcePermissions = [];
+        foreach ($resources as $resource) {
+            foreach ($actions as $action) {
+                $resourcePermissions[] = "{$action}:{$resource}";
+            }
+        }
+
+        $pagePermissions = ['View:Laporan', 'View:WhatsappGatewaySettings'];
+
+        $allPermissions = array_merge($permissionsKustom, $resourcePermissions, $pagePermissions);
+
+        foreach ($allPermissions as $permission) {
             Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
         }
 
-        // Roles — PRD §16.
+        // 3. Roles — PRD §16.
         $roles = ['warga', 'petugas', 'sekretaris_desa', 'kepala_desa', 'admin'];
         $created = [];
         foreach ($roles as $role) {
             $created[$role] = Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
         }
 
-        // Ikat permission approval sesuai matrix PRD §10.
-        $created['petugas']->givePermissionTo('approve_level_1');
-        $created['sekretaris_desa']->givePermissionTo('approve_level_2');
-        $created['kepala_desa']->givePermissionTo('approve_level_3_sign');
+        // 4. Ikat permission approval & akses resource sesuai matrix PRD §10.
+        $created['petugas']->givePermissionTo(['approve_level_1', 'ViewAny:PengajuanSurat', 'View:PengajuanSurat']);
+        
+        $created['sekretaris_desa']->givePermissionTo(['approve_level_2', 'ViewAny:PengajuanSurat', 'View:PengajuanSurat']);
+        
+        $created['kepala_desa']->givePermissionTo([
+            'approve_level_3_sign',
+            'ViewAny:PengajuanSurat',
+            'View:PengajuanSurat',
+            'ViewAny:SuratTerbit',
+            'View:SuratTerbit',
+            'View:Laporan',
+        ]);
 
-        // Permission resource Filament (dari Shield) untuk role staf — PRD §12.
-        // Ketiga role approver perlu melihat antrian PengajuanSurat.
-        $lihatPengajuan = ['ViewAny:PengajuanSurat', 'View:PengajuanSurat'];
-        foreach (['petugas', 'sekretaris_desa', 'kepala_desa'] as $role) {
-            $this->giveIfExists($created[$role], $lihatPengajuan);
-        }
-
-        // Kepala Desa juga melihat rekap surat terbit.
-        $this->giveIfExists($created['kepala_desa'], ['ViewAny:SuratTerbit', 'View:SuratTerbit']);
-
-        // Admin = super_admin (bypass gate via config), namun tetap diberi seluruh
-        // permission eksplisit agar konsisten bila intercept dinonaktifkan.
+        // 5. Admin = Beri seluruh permission
         $created['admin']->givePermissionTo(Permission::all());
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
-    }
-
-    /**
-     * Berikan permission hanya jika permission-nya sudah ada (di-generate Shield).
-     *
-     * @param  array<int, string>  $names
-     */
-    private function giveIfExists(Role $role, array $names): void
-    {
-        foreach ($names as $name) {
-            if (Permission::where('name', $name)->where('guard_name', 'web')->exists()) {
-                $role->givePermissionTo($name);
-            }
-        }
     }
 }

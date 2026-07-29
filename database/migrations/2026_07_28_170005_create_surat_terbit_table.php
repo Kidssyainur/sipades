@@ -14,6 +14,8 @@ return new class extends Migration
             $table->string('nomor_surat', 60)->unique();
             $table->foreignId('diterbitkan_oleh')->constrained('users'); // Kepala Desa
             $table->string('file_path');
+            $table->string('tte_token', 64)->nullable()->unique();
+            $table->string('qr_code_path')->nullable();
             $table->timestamp('tanggal_terbit');
             $table->timestamps();
         });

@@ -40,7 +40,7 @@ class PengajuanSurat extends Model implements HasMedia
         return LogOptions::defaults()
             ->logOnly(['status', 'current_level', 'catatan_revisi', 'alasan_penolakan'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+            ->dontLogEmptyChanges();
     }
 
     public function registerMediaCollections(): void

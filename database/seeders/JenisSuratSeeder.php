@@ -21,6 +21,8 @@ class JenisSuratSeeder extends Seeder
                 ],
                 'template_view' => 'surat.domisili',
                 'estimasi_hari' => 2,
+                'jumlah_level_approval' => 2,
+                'butuh_tte_kades' => true,
             ],
             [
                 'kode' => 'USAHA',
@@ -35,6 +37,8 @@ class JenisSuratSeeder extends Seeder
                 ],
                 'template_view' => 'surat.usaha',
                 'estimasi_hari' => 3,
+                'jumlah_level_approval' => 3,
+                'butuh_tte_kades' => true,
             ],
             [
                 'kode' => 'SKTM',
@@ -47,6 +51,8 @@ class JenisSuratSeeder extends Seeder
                 ],
                 'template_view' => 'surat.sktm',
                 'estimasi_hari' => 2,
+                'jumlah_level_approval' => 2,
+                'butuh_tte_kades' => true,
             ],
             [
                 'kode' => 'PENGANTAR_KTP',
@@ -58,6 +64,8 @@ class JenisSuratSeeder extends Seeder
                 ],
                 'template_view' => 'surat.pengantar_ktp',
                 'estimasi_hari' => 1,
+                'jumlah_level_approval' => 1,
+                'butuh_tte_kades' => false,
             ],
             [
                 'kode' => 'PENGANTAR_KK',
@@ -69,6 +77,8 @@ class JenisSuratSeeder extends Seeder
                 ],
                 'template_view' => 'surat.pengantar_kk',
                 'estimasi_hari' => 1,
+                'jumlah_level_approval' => 1,
+                'butuh_tte_kades' => false,
             ],
             [
                 'kode' => 'KELAHIRAN',
@@ -85,6 +95,8 @@ class JenisSuratSeeder extends Seeder
                 ],
                 'template_view' => 'surat.kelahiran',
                 'estimasi_hari' => 2,
+                'jumlah_level_approval' => 3,
+                'butuh_tte_kades' => true,
             ],
             [
                 'kode' => 'KEMATIAN',
@@ -99,6 +111,8 @@ class JenisSuratSeeder extends Seeder
                 ],
                 'template_view' => 'surat.kematian',
                 'estimasi_hari' => 2,
+                'jumlah_level_approval' => 3,
+                'butuh_tte_kades' => true,
             ],
         ];
 

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\NotifikasiLogs\Tables;
 
 use App\Jobs\KirimNotifikasiWhatsappJob;
 use App\Models\NotifikasiLog;
+use App\Services\WhatsappGatewayService;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
@@ -18,7 +19,7 @@ class NotifikasiLogsTable
         return $table
             ->columns([
                 TextColumn::make('created_at')
-                    ->label('Waktu')
+                    ->label('Waktu Log')
                     ->dateTime('d M Y H:i')
                     ->sortable(),
                 TextColumn::make('no_hp_tujuan')
@@ -36,7 +37,7 @@ class NotifikasiLogsTable
                     ->placeholder('—')
                     ->toggleable(),
                 TextColumn::make('pesan')
-                    ->label('Pesan')
+                    ->label('Isi Pesan WA')
                     ->limit(50)
                     ->tooltip(fn (NotifikasiLog $record): ?string => $record->pesan)
                     ->toggleable(),
@@ -49,9 +50,9 @@ class NotifikasiLogsTable
                         'pending' => 'warning',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn (string $state): string => ucfirst($state)),
+                    ->formatStateUsing(fn (string $state): string => strtoupper($state)),
                 TextColumn::make('percobaan')
-                    ->label('Percobaan')
+                    ->label('Retry')
                     ->numeric()
                     ->alignCenter()
                     ->sortable(),
@@ -74,27 +75,47 @@ class NotifikasiLogsTable
             ])
             ->recordActions([
                 Action::make('kirim_ulang')
-                    ->label('Kirim Ulang')
+                    ->label('Kirim Ulang (Retry)')
                     ->icon(Heroicon::OutlinedArrowPath)
                     ->color('warning')
                     ->requiresConfirmation()
-                    ->modalHeading('Kirim Ulang Notifikasi')
-                    ->modalDescription('Pesan yang sama akan dikirim ulang ke nomor tujuan melalui gateway WhatsApp.')
-                    ->visible(fn (NotifikasiLog $record): bool => $record->status === 'gagal')
-                    ->action(function (NotifikasiLog $record): void {
-                        KirimNotifikasiWhatsappJob::dispatch(
-                            noHp: $record->no_hp_tujuan,
-                            pesan: $record->pesan,
-                            userId: $record->user_id,
-                            pengajuanSuratId: $record->pengajuan_surat_id,
-                            templatePesanId: $record->template_pesan_id,
-                        );
+                    ->modalHeading('Kirim Ulang Notifikasi WA')
+                    ->modalDescription('Pesan akan dicoba kirim ulang secara langsung melalui Go-WA Gateway.')
+                    ->visible(fn (NotifikasiLog $record): bool => in_array($record->status, ['gagal', 'pending'], true))
+                    ->action(function (NotifikasiLog $record, WhatsappGatewayService $gateway): void {
+                        try {
+                            $hasil = $gateway->send($record->no_hp_tujuan, $record->pesan);
 
-                        Notification::make()
-                            ->title('Notifikasi dijadwalkan ulang')
-                            ->body('Pesan telah dimasukkan ke antrian pengiriman.')
-                            ->success()
-                            ->send();
+                            $record->update([
+                                'status' => $hasil['sukses'] ? 'terkirim' : 'gagal',
+                                'percobaan' => $record->percobaan + 1,
+                                'response_gateway' => is_string($hasil['body']) ? $hasil['body'] : json_encode($hasil['body']),
+                                'dikirim_pada' => $hasil['sukses'] ? now() : null,
+                            ]);
+
+                            if ($hasil['sukses']) {
+                                Notification::make()
+                                    ->title('Pesan Berhasil Dikirim Ulang')
+                                    ->body('Go-WA merespons sukses: ' . $hasil['body'])
+                                    ->success()
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->title('Pengiriman Ulang Gagal')
+                                    ->body('Go-WA Gateway status: ' . $hasil['status_code'])
+                                    ->danger()
+                                    ->send();
+                            }
+                        } catch (\Throwable $e) {
+                            $record->increment('percobaan');
+                            $record->update(['response_gateway' => $e->getMessage()]);
+
+                            Notification::make()
+                                ->title('Gagal Mengirim Ulang')
+                                ->body($e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
                     }),
             ])
             ->toolbarActions([]);

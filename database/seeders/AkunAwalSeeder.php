@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\DataKependudukan;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -10,7 +11,7 @@ class AkunAwalSeeder extends Seeder
 {
     public function run(): void
     {
-        // Akun staf dibuat manual pasca-migrate (bukan lewat portal registrasi warga) — PRD §16.
+        // Akun awal staf & warga uji coba — PRD §16.
         $akun = [
             [
                 'name' => 'Administrator',
@@ -36,14 +37,25 @@ class AkunAwalSeeder extends Seeder
                 'no_hp' => '6281200000004',
                 'role' => 'petugas',
             ],
+            [
+                'name' => 'Ahmad Fauzi (Warga Uji Coba)',
+                'email' => 'warga@karduluk.desa.id',
+                'nik' => '3529010101800001',
+                'no_hp' => '6281234567890',
+                'role' => 'warga',
+            ],
         ];
 
         foreach ($akun as $data) {
             $role = $data['role'];
             unset($data['role']);
 
+            $condition = ! empty($data['nik'])
+                ? ['nik' => $data['nik']]
+                : ['email' => $data['email']];
+
             $user = User::updateOrCreate(
-                ['email' => $data['email']],
+                $condition,
                 $data + [
                     'password' => Hash::make('password'),
                     'is_active' => true,
@@ -52,6 +64,12 @@ class AkunAwalSeeder extends Seeder
             );
 
             $user->syncRoles([$role]);
+
+            if ($role === 'warga' && ! empty($user->nik)) {
+                DataKependudukan::where('nik', $user->nik)->update([
+                    'sudah_didaftarkan' => true,
+                ]);
+            }
         }
     }
 }

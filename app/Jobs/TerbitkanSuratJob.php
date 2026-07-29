@@ -15,6 +15,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 class TerbitkanSuratJob implements ShouldQueue
 {
@@ -40,15 +41,20 @@ class TerbitkanSuratJob implements ShouldQueue
 
         $suratTerbit = DB::transaction(function () use ($pengajuan, $nomorSurat, $pdf) {
             $nomor = $nomorSurat->generate($pengajuan->jenis_surat_id);
-            $filePath = $pdf->generate($pengajuan, $nomor);
+            $tteToken = 'TTE-KDL-' . strtoupper(Str::random(16));
 
             $surat = SuratTerbit::create([
                 'pengajuan_surat_id' => $pengajuan->id,
                 'nomor_surat' => $nomor,
                 'diterbitkan_oleh' => $this->diterbitkanOleh,
-                'file_path' => $filePath,
+                'file_path' => 'surat/pending.pdf',
+                'tte_token' => $tteToken,
                 'tanggal_terbit' => now(),
             ]);
+
+            $filePath = $pdf->generate($pengajuan, $nomor, $surat);
+
+            $surat->update(['file_path' => $filePath]);
 
             $pengajuan->update([
                 'status' => StatusPengajuan::SELESAI,

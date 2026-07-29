@@ -14,14 +14,7 @@ use Illuminate\Validation\UnauthorizedException;
 use InvalidArgumentException;
 
 /**
- * State machine approval multi-level (PRD §11.4 & FR-04/FR-09).
- *
- * Setiap keputusan approval:
- *  1. Validasi approver punya permission untuk `current_level`.
- *  2. Insert baris `approval_log`.
- *  3. Update `status` & `current_level` PengajuanSurat.
- *  4. Dispatch notifikasi WA sesuai hasil keputusan.
- *  5. Jika Kepala Desa setuju → dispatch TerbitkanSuratJob (§11.5).
+ * State machine approval multi-level (fleksibel 1, 2, atau 3 level per jenis surat).
  */
 class ApprovalService
 {
@@ -37,43 +30,59 @@ class ApprovalService
      */
     public function setujui(PengajuanSurat $pengajuan, User $approver, ?string $catatan = null): PengajuanSurat
     {
+        $pengajuan->loadMissing('jenisSurat');
         $this->pastikanBolehApprove($pengajuan, $approver);
 
         $level = $pengajuan->current_level;
+        $maxLevel = $pengajuan->jenisSurat->jumlah_level_approval ?? 3;
+        $butuhTte = $pengajuan->jenisSurat->butuh_tte_kades ?? true;
 
-        return DB::transaction(function () use ($pengajuan, $approver, $level, $catatan) {
-            $this->catatKeputusan($pengajuan, $approver, 'setuju', $catatan, tandatangan: $level === 3);
+        return DB::transaction(function () use ($pengajuan, $approver, $level, $maxLevel, $butuhTte, $catatan) {
+            $isFinalLevel = ($level >= $maxLevel);
 
-            match ($level) {
-                1 => $pengajuan->update([
-                    'status' => StatusPengajuan::DIVERIFIKASI_PETUGAS,
-                    'current_level' => 2,
-                ]),
-                2 => $pengajuan->update([
-                    'status' => StatusPengajuan::DISETUJUI_SEKRETARIS,
-                    'current_level' => 3,
-                ]),
-                3 => $pengajuan->update([
+            $this->catatKeputusan(
+                $pengajuan,
+                $approver,
+                'setuju',
+                $catatan,
+                tandatangan: $isFinalLevel && $butuhTte
+            );
+
+            if ($isFinalLevel) {
+                // Pengajuan disetujui penuh pada level maksimum jenis surat ini
+                $pengajuan->update([
                     'status' => StatusPengajuan::DISETUJUI_KEPALA,
-                ]),
-                default => throw new InvalidArgumentException("Level approval tidak valid: {$level}"),
-            };
+                ]);
+            } else {
+                // Lanjut ke level berikutnya
+                $nextLevel = $level + 1;
+                $nextStatus = match ($nextLevel) {
+                    2 => StatusPengajuan::DIVERIFIKASI_PETUGAS,
+                    3 => StatusPengajuan::DISETUJUI_SEKRETARIS,
+                    default => StatusPengajuan::DIVERIFIKASI_PETUGAS,
+                };
+
+                $pengajuan->update([
+                    'status' => $nextStatus,
+                    'current_level' => $nextLevel,
+                ]);
+            }
 
             $pengajuan->refresh();
 
-            // Notifikasi hasil persetujuan per level.
+            // Notifikasi hasil persetujuan per level
             $kodeTemplate = match ($level) {
-                1 => 'DISETUJUI_PETUGAS',
-                2 => 'DISETUJUI_SEKRETARIS',
-                3 => null, // notifikasi terbit dikirim oleh TerbitkanSuratJob.
+                1 => $isFinalLevel ? null : 'DISETUJUI_PETUGAS',
+                2 => $isFinalLevel ? null : 'DISETUJUI_SEKRETARIS',
+                default => null,
             };
 
             if ($kodeTemplate !== null) {
                 $this->kirimNotifikasi($pengajuan, $kodeTemplate);
             }
 
-            // Kepala Desa setuju → terbitkan surat (§11.5).
-            if ($level === 3) {
+            // Jika level final → terbitkan surat PDF & TTE
+            if ($isFinalLevel) {
                 TerbitkanSuratJob::dispatch(
                     pengajuanSuratId: $pengajuan->id,
                     diterbitkanOleh: $approver->id,
@@ -85,8 +94,7 @@ class ApprovalService
     }
 
     /**
-     * Approver meminta revisi. Status → direvisi, current_level dikembalikan ke 1
-     * (kecuali level 1 yang memang sudah di 1).
+     * Approver meminta revisi. Status → direvisi, current_level dikembalikan ke 1.
      */
     public function mintaRevisi(PengajuanSurat $pengajuan, User $approver, string $catatan): PengajuanSurat
     {
@@ -132,7 +140,6 @@ class ApprovalService
 
     /**
      * Cek apakah user boleh mengambil keputusan approval untuk pengajuan ini.
-     * Dipakai juga oleh Filament Action untuk menyembunyikan tombol.
      */
     public function bolehApprove(PengajuanSurat $pengajuan, User $approver): bool
     {
@@ -162,9 +169,6 @@ class ApprovalService
         }
     }
 
-    /**
-     * Status yang masih membutuhkan keputusan approver pada current_level.
-     */
     private function statusMenunggu(PengajuanSurat $pengajuan): bool
     {
         return in_array($pengajuan->status, [
@@ -185,7 +189,7 @@ class ApprovalService
             'pengajuan_surat_id' => $pengajuan->id,
             'user_id' => $approver->id,
             'level' => $pengajuan->current_level,
-            'role_saat_itu' => $approver->getRoleNames()->first(),
+            'role_saat_itu' => $approver->getRoleNames()->first() ?? 'staf',
             'keputusan' => $keputusan,
             'catatan' => $catatan,
             'ditandatangani_pada' => $tandatangan ? now() : null,

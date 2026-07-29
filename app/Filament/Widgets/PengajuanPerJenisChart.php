@@ -3,95 +3,37 @@
 namespace App\Filament\Widgets;
 
 use App\Models\JenisSurat;
-use App\Models\PengajuanSurat;
 use Filament\Widgets\ChartWidget;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
-use Illuminate\Database\Eloquent\Builder;
 
 class PengajuanPerJenisChart extends ChartWidget
 {
-    use InteractsWithPageFilters;
+    protected ?string $heading = 'Distribusi Pengajuan per Jenis Surat';
 
-    protected static bool $isDiscovered = false;
-
-    protected ?string $heading = 'Pengajuan per Jenis Surat';
-
-    protected int|string|array $columnSpan = 'full';
-
-    protected ?string $maxHeight = '320px';
-
-    protected function getType(): string
-    {
-        return 'bar';
-    }
+    protected static ?int $sort = 2;
 
     protected function getData(): array
     {
-        $counts = $this->query()
-            ->selectRaw('jenis_surat_id, COUNT(*) as agregat')
-            ->groupBy('jenis_surat_id')
-            ->pluck('agregat', 'jenis_surat_id');
+        $jenisList = JenisSurat::withCount('pengajuanSurat')->get();
 
-        $jenisSurat = JenisSurat::query()
-            ->orderBy('nama')
-            ->get(['id', 'nama']);
-
-        $labels = [];
-        $data = [];
-
-        foreach ($jenisSurat as $jenis) {
-            $labels[] = $jenis->nama;
-            $data[] = (int) ($counts[$jenis->id] ?? 0);
-        }
+        $labels = $jenisList->pluck('nama')->toArray();
+        $counts = $jenisList->pluck('pengajuan_surat_count')->toArray();
 
         return [
             'datasets' => [
                 [
                     'label' => 'Jumlah Pengajuan',
-                    'data' => $data,
-                    'backgroundColor' => '#f59e0b',
-                    'borderColor' => '#d97706',
+                    'data' => $counts,
+                    'backgroundColor' => [
+                        '#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#f97316',
+                    ],
                 ],
             ],
             'labels' => $labels,
         ];
     }
 
-    protected function getOptions(): array
+    protected function getType(): string
     {
-        return [
-            'scales' => [
-                'y' => [
-                    'beginAtZero' => true,
-                    'ticks' => ['precision' => 0],
-                ],
-            ],
-            'plugins' => [
-                'legend' => ['display' => false],
-            ],
-        ];
-    }
-
-    protected function query(): Builder
-    {
-        $query = PengajuanSurat::query();
-
-        $dari = $this->pageFilters['dari'] ?? null;
-        $sampai = $this->pageFilters['sampai'] ?? null;
-        $jenisSuratId = $this->pageFilters['jenis_surat_id'] ?? null;
-
-        if ($dari) {
-            $query->whereDate('tanggal_pengajuan', '>=', $dari);
-        }
-
-        if ($sampai) {
-            $query->whereDate('tanggal_pengajuan', '<=', $sampai);
-        }
-
-        if ($jenisSuratId) {
-            $query->where('jenis_surat_id', $jenisSuratId);
-        }
-
-        return $query;
+        return 'doughnut';
     }
 }

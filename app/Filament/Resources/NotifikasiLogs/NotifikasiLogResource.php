@@ -23,9 +23,9 @@ class NotifikasiLogResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Log Notifikasi';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Arsip & Laporan';
+    protected static string|UnitEnum|null $navigationGroup = 'WhatsApp Gateway';
 
-    protected static ?int $navigationSort = 30;
+    protected static ?int $navigationSort = 10;
 
     public static function table(Table $table): Table
     {

@@ -19,8 +19,6 @@ use UnitEnum;
 
 class Laporan extends Page
 {
-    use HasFiltersForm;
-
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
 
     protected static string|UnitEnum|null $navigationGroup = 'Arsip & Laporan';
@@ -32,6 +30,13 @@ class Laporan extends Page
     protected static ?string $title = 'Laporan Rekapitulasi Pengajuan';
 
     protected string $view = 'filament.pages.laporan';
+
+    public ?array $data = [];
+
+    public function mount(): void
+    {
+        $this->form->fill();
+    }
 
     public static function canAccess(): bool
     {
@@ -45,9 +50,10 @@ class Laporan extends Page
         return static::canAccess();
     }
 
-    public function filtersForm(Schema $schema): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema
+            ->statePath('data')
             ->components([
                 Section::make('Filter Periode')
                     ->description('Saring rekapitulasi berdasarkan rentang tanggal dan jenis surat.')
@@ -55,11 +61,13 @@ class Laporan extends Page
                         DatePicker::make('dari')
                             ->label('Tanggal Dari')
                             ->native(false)
-                            ->maxDate(now()),
+                            ->maxDate(now())
+                            ->live(),
                         DatePicker::make('sampai')
                             ->label('Tanggal Sampai')
                             ->native(false)
-                            ->maxDate(now()),
+                            ->maxDate(now())
+                            ->live(),
                         Select::make('jenis_surat_id')
                             ->label('Jenis Surat')
                             ->placeholder('Semua Jenis Surat')
@@ -67,10 +75,18 @@ class Laporan extends Page
                                 ->orderBy('nama')
                                 ->pluck('nama', 'id')
                                 ->all())
-                            ->searchable(),
+                            ->searchable()
+                            ->live(),
                     ])
                     ->columns(3),
             ]);
+    }
+
+    public function getWidgetData(): array
+    {
+        return [
+            'pageFilters' => $this->data,
+        ];
     }
 
     protected function getFooterWidgets(): array
@@ -80,10 +96,5 @@ class Laporan extends Page
             PengajuanPerJenisChart::class,
             PengajuanPerPeriodeChart::class,
         ];
-    }
-
-    public function getFooterWidgetsColumns(): int|array
-    {
-        return 1;
     }
 }

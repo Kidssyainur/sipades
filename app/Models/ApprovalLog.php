@@ -28,7 +28,7 @@ class ApprovalLog extends Model
         return LogOptions::defaults()
             ->logOnly(['pengajuan_surat_id', 'user_id', 'level', 'role_saat_itu', 'keputusan', 'catatan', 'ditandatangani_pada'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+            ->dontLogEmptyChanges();
     }
 
     public function pengajuanSurat(): BelongsTo

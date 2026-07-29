@@ -40,7 +40,7 @@ class User extends Authenticatable implements FilamentUser
         return LogOptions::defaults()
             ->logOnly(['name', 'email', 'nik', 'no_hp', 'is_active'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+            ->dontLogEmptyChanges();
     }
 
     public function pengajuanSurat(): HasMany

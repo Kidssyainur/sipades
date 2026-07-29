@@ -47,6 +47,20 @@ class JenisSuratForm
                             ->numeric()
                             ->minValue(1)
                             ->default(3),
+                        Select::make('jumlah_level_approval')
+                            ->label('Alur / Jumlah Level Approval')
+                            ->required()
+                            ->options([
+                                1 => '1 Level (Hanya Verifikasi Petugas Desa)',
+                                2 => '2 Level (Petugas Desa → Sekretaris Desa)',
+                                3 => '3 Level (Petugas Desa → Sekdes → Kepala Desa & TTE)',
+                            ])
+                            ->default(3)
+                            ->helperText('Menentukan berapa tingkat persetujuan sebelum surat terbit.'),
+                        Toggle::make('butuh_tte_kades')
+                            ->label('Butuh Tanda Tangan Elektronik (TTE)')
+                            ->default(true)
+                            ->helperText('Tampilkan blok TTE dan QR Code verifikasi pada PDF surat terbit.'),
                         Toggle::make('is_active')
                             ->label('Aktif')
                             ->default(true)

@@ -92,17 +92,7 @@
     </div>
 
     <div class="ttd">
-        <table>
-            <tr>
-                <td style="width:55%;"></td>
-                <td class="kolom-kanan">
-                    {{ $desa['nama'] }}, {{ \Illuminate\Support\Carbon::parse($tanggalTerbit)->translatedFormat('d F Y') }}<br>
-                    Kepala {{ $desa['nama'] }}
-                    <div class="spasi-ttd"></div>
-                    <span class="nama-pejabat">{{ $penandatangan ?? '.....................................' }}</span>
-                </td>
-            </tr>
-        </table>
+        @include('surat.partials.footer_tte')
     </div>
 
     <div class="footer-catatan">

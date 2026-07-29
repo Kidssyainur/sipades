@@ -14,6 +14,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
 class PengajuanSuratResource extends Resource
 {
@@ -26,6 +27,8 @@ class PengajuanSuratResource extends Resource
     protected static ?string $modelLabel = 'Pengajuan Surat';
 
     protected static ?string $pluralModelLabel = 'Pengajuan Surat';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Pelayanan Surat';
 
     protected static ?int $navigationSort = 1;
 
