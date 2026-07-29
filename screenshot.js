@@ -31,7 +31,7 @@ function getExecutablePath() {
     return null;
 }
 
-// Fungsi penungguan rendering (Tunggu 10 detik tanpa auto scroll)
+// Fungsi penungguan rendering sederhana (Tunggu 10 detik tanpa auto-scroll)
 async function waitForPageRender(page, delayMs = RENDER_DELAY_MS) {
     await new Promise(r => setTimeout(r, delayMs));
 }
@@ -66,6 +66,7 @@ async function takeScreenshots() {
         { name: '03_registrasi_warga.png', path: '/registrasi' },
         { name: '04_verifikasi_otp.png', path: '/verifikasi-otp' },
         { name: '05_admin_login.png', path: '/admin/login' },
+        { name: '06_verifikasi_surat_tte_publik.png', path: '/verifikasi-surat/TTE-KDL-DEMO12345' },
     ];
 
     for (const p of publicPages) {
@@ -91,6 +92,7 @@ async function takeScreenshots() {
         await wargaPage.goto(`${BASE_URL}/portal/login`, { waitUntil: 'networkidle0', timeout: 45000 });
         await new Promise(r => setTimeout(r, 2000));
 
+        await wargaPage.waitForSelector('input[type="email"], input[name*="email"], input[id*="email"]', { timeout: 15000 });
         const emailInput = await wargaPage.$('input[type="email"], input[name*="email"], input[id*="email"]');
         const passwordInput = await wargaPage.$('input[type="password"], input[name*="password"], input[id*="password"]');
 
@@ -111,13 +113,13 @@ async function takeScreenshots() {
     }
 
     const portalPages = [
-        { name: '06_portal_dashboard.png', path: '/portal/dashboard' },
-        { name: '07_portal_ajukan_surat_buat.png', path: '/portal/pengajuan/buat' },
-        { name: '08_portal_pengajuan_index.png', path: '/portal/pengajuan' },
-        { name: '09_portal_pengajuan_status_detail.png', path: '/portal/pengajuan/1/status' },
-        { name: '10_portal_pengajuan_revisi.png', path: '/portal/pengajuan/1/revisi' },
-        { name: '11_portal_surat_terbit_index.png', path: '/portal/surat-terbit' },
-        { name: '12_portal_profil_saya.png', path: '/portal/profil' },
+        { name: '07_portal_dashboard.png', path: '/portal/dashboard' },
+        { name: '08_portal_ajukan_surat_buat.png', path: '/portal/pengajuan/buat' },
+        { name: '09_portal_pengajuan_index.png', path: '/portal/pengajuan' },
+        { name: '10_portal_pengajuan_status_detail.png', path: '/portal/pengajuan/2/status' },
+        { name: '11_portal_pengajuan_revisi.png', path: '/portal/pengajuan/1/revisi' },
+        { name: '12_portal_surat_terbit_index.png', path: '/portal/surat-terbit' },
+        { name: '13_portal_profil_saya.png', path: '/portal/profil' },
     ];
 
     for (const p of portalPages) {
@@ -143,10 +145,13 @@ async function takeScreenshots() {
         await adminPage.goto(`${BASE_URL}/admin/login`, { waitUntil: 'networkidle0', timeout: 45000 });
         await new Promise(r => setTimeout(r, 2000));
 
-        const inputs = await adminPage.$$('input');
-        if (inputs.length >= 2) {
-            await inputs[0].type('admin@karduluk.desa.id');
-            await inputs[1].type('password');
+        await adminPage.waitForSelector('input[type="email"], input[name*="email"], input[id*="email"]', { timeout: 15000 });
+        const emailInput = await adminPage.$('input[type="email"], input[name*="email"], input[id*="email"]');
+        const passwordInput = await adminPage.$('input[type="password"], input[name*="password"], input[id*="password"]');
+
+        if (emailInput && passwordInput) {
+            await emailInput.type('admin@karduluk.desa.id');
+            await passwordInput.type('password');
 
             const submitBtn = await adminPage.$('button[type="submit"]');
             if (submitBtn) {
@@ -161,26 +166,26 @@ async function takeScreenshots() {
     }
 
     const adminPages = [
-        { name: '13_admin_dashboard.png', path: '/admin' },
-        { name: '14_admin_jenis_surat_index.png', path: '/admin/jenis-surats' },
-        { name: '15_admin_jenis_surat_create.png', path: '/admin/jenis-surats/create' },
-        { name: '16_admin_jenis_surat_edit.png', path: '/admin/jenis-surats/1/edit' },
-        { name: '17_admin_pengajuan_surat_index.png', path: '/admin/pengajuan-surats' },
-        { name: '18_admin_pengajuan_surat_detail.png', path: '/admin/pengajuan-surats/1' },
-        { name: '19_admin_surat_terbit_index.png', path: '/admin/surat-terbits' },
-        { name: '20_admin_template_pesan_index.png', path: '/admin/template-pesans' },
-        { name: '21_admin_template_pesan_create.png', path: '/admin/template-pesans/create' },
-        { name: '22_admin_template_pesan_edit.png', path: '/admin/template-pesans/1/edit' },
-        { name: '23_admin_notifikasi_log_index.png', path: '/admin/notifikasi-logs' },
-        { name: '24_admin_whatsapp_settings.png', path: '/admin/whatsapp-gateway-settings' },
-        { name: '25_admin_laporan.png', path: '/admin/laporan' },
-        { name: '26_admin_users_index.png', path: '/admin/users' },
-        { name: '27_admin_users_create.png', path: '/admin/users/create' },
-        { name: '28_admin_users_edit.png', path: '/admin/users/1/edit' },
-        { name: '29_admin_activity_logs.png', path: '/admin/activity-logs' },
-        { name: '30_admin_shield_roles_index.png', path: '/admin/shield/roles' },
-        { name: '31_admin_shield_roles_create.png', path: '/admin/shield/roles/create' },
-        { name: '32_admin_shield_roles_edit.png', path: '/admin/shield/roles/1/edit' },
+        { name: '14_admin_dashboard.png', path: '/admin' },
+        { name: '15_admin_jenis_surat_index.png', path: '/admin/jenis-surats' },
+        { name: '16_admin_jenis_surat_create.png', path: '/admin/jenis-surats/create' },
+        { name: '17_admin_jenis_surat_edit.png', path: '/admin/jenis-surats/1/edit' },
+        { name: '18_admin_pengajuan_surat_index.png', path: '/admin/pengajuan-surats' },
+        { name: '19_admin_pengajuan_surat_detail.png', path: '/admin/pengajuan-surats/1' },
+        { name: '20_admin_surat_terbit_index.png', path: '/admin/surat-terbits' },
+        { name: '21_admin_template_pesan_index.png', path: '/admin/template-pesans' },
+        { name: '22_admin_template_pesan_create.png', path: '/admin/template-pesans/create' },
+        { name: '23_admin_template_pesan_edit.png', path: '/admin/template-pesans/1/edit' },
+        { name: '24_admin_notifikasi_log_index.png', path: '/admin/notifikasi-logs' },
+        { name: '25_admin_whatsapp_settings.png', path: '/admin/whatsapp-gateway-settings' },
+        { name: '26_admin_laporan.png', path: '/admin/laporan' },
+        { name: '27_admin_users_index.png', path: '/admin/users' },
+        { name: '28_admin_users_create.png', path: '/admin/users/create' },
+        { name: '29_admin_users_edit.png', path: '/admin/users/1/edit' },
+        { name: '30_admin_activity_logs.png', path: '/admin/activity-logs' },
+        { name: '31_admin_shield_roles_index.png', path: '/admin/shield/roles' },
+        { name: '32_admin_shield_roles_create.png', path: '/admin/shield/roles/create' },
+        { name: '33_admin_shield_roles_edit.png', path: '/admin/shield/roles/1/edit' },
     ];
 
     for (const p of adminPages) {
@@ -195,7 +200,7 @@ async function takeScreenshots() {
     }
 
     await browser.close();
-    console.log(`\n🎉 Seluruh 32 screenshot berhasil diambil & disimpan di: ${SCREENSHOT_DIR}`);
+    console.log(`\n🎉 Seluruh 33 screenshot berhasil diambil & disimpan di: ${SCREENSHOT_DIR}`);
 }
 
 takeScreenshots().catch(console.error);

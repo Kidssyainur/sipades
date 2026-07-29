@@ -22,6 +22,11 @@ class LaporanDummySeeder extends Seeder
         $wargaRole = Role::firstOrCreate(['name' => 'warga', 'guard_name' => 'web']);
         $wargaUsers = [];
 
+        $wargaUtama = User::where('email', 'warga@karduluk.desa.id')->first();
+        if ($wargaUtama) {
+            $wargaUsers[] = $wargaUtama;
+        }
+
         foreach ($penduduk as $data) {
             $user = User::where('nik', $data->nik)->first();
             if (! $user) {
@@ -46,6 +51,57 @@ class LaporanDummySeeder extends Seeder
             return;
         }
 
+        // 2. Pastikan Warga Utama (warga@karduluk.desa.id) Memiliki Pengajuan Khusus untuk Testing
+        if ($wargaUtama) {
+            $jenisContoh = $jenisSurats->first();
+            
+            // Pengajuan 1: DIREVISI (agar /portal/pengajuan/{id}/revisi bisa diakses 200 OK)
+            $pRevisi = PengajuanSurat::create([
+                'nomor_referensi' => 'REG-' . now()->format('Ymd') . '-0001',
+                'user_id' => $wargaUtama->id,
+                'jenis_surat_id' => $jenisContoh->id,
+                'data_formulir' => [
+                    'keperluan' => 'Keperluan Surat Keterangan Usaha (Revisi Dokumen)',
+                    'alamat_domisili' => 'Dusun Tengah RT 01 RW 02 Desa Karduluk',
+                    'nama_usaha' => 'Toko Kelontong Berkah',
+                ],
+                'status' => StatusPengajuan::DIREVISI->value,
+                'current_level' => 1,
+                'catatan_revisi' => 'Mohon unggah kembali Kartu Keluarga terbaru yang terlegalisir.',
+                'tanggal_pengajuan' => now()->subDays(2),
+            ]);
+
+            // Pengajuan 2: SELESAI & Surat Terbit (agar /portal/pengajuan/{id}/status & unduh bisa diakses 200 OK)
+            $pSelesai = PengajuanSurat::create([
+                'nomor_referensi' => 'REG-' . now()->format('Ymd') . '-0002',
+                'user_id' => $wargaUtama->id,
+                'jenis_surat_id' => $jenisContoh->id,
+                'data_formulir' => [
+                    'keperluan' => 'Keperluan Administrasi Bank BCA',
+                    'alamat_domisili' => 'Dusun Tengah RT 01 RW 02 Desa Karduluk',
+                ],
+                'status' => StatusPengajuan::SELESAI->value,
+                'current_level' => 3,
+                'tanggal_pengajuan' => now()->subDays(5),
+                'tanggal_selesai' => now()->subDays(4),
+            ]);
+
+            $nomorDummy = '140/001/435.302.10/' . date('Y');
+            $tteToken = 'TTE-KDL-DEMO12345';
+
+            $surat = SuratTerbit::create([
+                'pengajuan_surat_id' => $pSelesai->id,
+                'nomor_surat' => $nomorDummy,
+                'diterbitkan_oleh' => $adminUser?->id ?? 1,
+                'file_path' => 'surat/pending.pdf',
+                'tte_token' => $tteToken,
+                'tanggal_terbit' => $pSelesai->tanggal_selesai,
+            ]);
+
+            $filePath = app(\App\Services\SuratPdfService::class)->generate($pSelesai, $nomorDummy, $surat);
+            $surat->update(['file_path' => $filePath]);
+        }
+
         $statuses = [
             StatusPengajuan::SELESAI->value,
             StatusPengajuan::SELESAI->value,
@@ -58,13 +114,12 @@ class LaporanDummySeeder extends Seeder
             StatusPengajuan::DITOLAK->value,
         ];
 
-        // 2. Generate 45 pengajuan surat contoh dalam kurun 6 bulan terakhir (Februari - Juli 2026)
-        $counter = 1;
+        // 3. Generate 40 pengajuan surat contoh dalam kurun 6 bulan terakhir
+        $counter = 3;
         for ($monthOffset = 5; $monthOffset >= 0; $monthOffset--) {
             $baseDate = Carbon::now()->subMonths($monthOffset)->startOfMonth();
 
-            // Buat 7-8 pengajuan per bulan
-            $countThisMonth = rand(6, 9);
+            $countThisMonth = rand(5, 8);
             for ($i = 0; $i < $countThisMonth; $i++) {
                 $user = $wargaUsers[array_rand($wargaUsers)];
                 $jenis = $jenisSurats->random();
