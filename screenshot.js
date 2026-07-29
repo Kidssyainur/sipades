@@ -5,8 +5,8 @@ import puppeteer from 'puppeteer';
 const BASE_URL = process.env.APP_URL || 'http://127.0.0.1:8000';
 const SCREENSHOT_DIR = path.resolve(process.cwd(), 'screenshots');
 
-// Waktu penungguan rendering per halaman (6000ms = 6 detik)
-const RENDER_DELAY_MS = 6000;
+// Waktu penungguan rendering per halaman (10000ms = 10 detik)
+const RENDER_DELAY_MS = 10000;
 // Waktu penungguan autentikasi login (5000ms = 5 detik)
 const LOGIN_DELAY_MS = 5000;
 
@@ -31,19 +31,14 @@ function getExecutablePath() {
     return null;
 }
 
-// Fungsi penungguan rendering sempurna (Livewire, Alpine, Fonts, Charts, Animations)
+// Fungsi penungguan rendering (Tunggu 10 detik tanpa auto scroll)
 async function waitForPageRender(page, delayMs = RENDER_DELAY_MS) {
-    // Scroll perlahan ke bawah untuk memicu lazy loading komponen
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)).catch(() => {});
-    await new Promise(r => setTimeout(r, 600));
-    await page.evaluate(() => window.scrollTo(0, 0)).catch(() => {});
-    // Tunggu koneksi jaringan & animasi render
     await new Promise(r => setTimeout(r, delayMs));
 }
 
 async function takeScreenshots() {
     console.log('🚀 Memulai SIPADES Screenshot Generator...');
-    console.log(`⏱️ Waktu tunggu render per halaman disetel: ${RENDER_DELAY_MS / 1000} detik`);
+    console.log(`⏱️ Waktu tunggu render per halaman disetel: ${RENDER_DELAY_MS / 1000} detik (Tanpa auto-scroll)`);
 
     const execPath = getExecutablePath();
     const launchOptions = {
