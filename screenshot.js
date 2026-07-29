@@ -5,6 +5,11 @@ import puppeteer from 'puppeteer';
 const BASE_URL = process.env.APP_URL || 'http://127.0.0.1:8000';
 const SCREENSHOT_DIR = path.resolve(process.cwd(), 'screenshots');
 
+// Waktu penungguan rendering per halaman (6000ms = 6 detik)
+const RENDER_DELAY_MS = 6000;
+// Waktu penungguan autentikasi login (5000ms = 5 detik)
+const LOGIN_DELAY_MS = 5000;
+
 if (!fs.existsSync(SCREENSHOT_DIR)) {
     fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
 }
@@ -26,18 +31,19 @@ function getExecutablePath() {
     return null;
 }
 
-// Function to wait for full rendering (Livewire, Alpine, Fonts, Charts)
-async function waitForPageRender(page, delayMs = 3500) {
-    // Scroll to trigger lazy elements
+// Fungsi penungguan rendering sempurna (Livewire, Alpine, Fonts, Charts, Animations)
+async function waitForPageRender(page, delayMs = RENDER_DELAY_MS) {
+    // Scroll perlahan ke bawah untuk memicu lazy loading komponen
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)).catch(() => {});
-    await new Promise(r => setTimeout(r, 400));
+    await new Promise(r => setTimeout(r, 600));
     await page.evaluate(() => window.scrollTo(0, 0)).catch(() => {});
-    // Wait for network and rendering animations
+    // Tunggu koneksi jaringan & animasi render
     await new Promise(r => setTimeout(r, delayMs));
 }
 
 async function takeScreenshots() {
-    console.log('🚀 Starting SIPADES screenshot generator with extended render wait time...');
+    console.log('🚀 Memulai SIPADES Screenshot Generator...');
+    console.log(`⏱️ Waktu tunggu render per halaman disetel: ${RENDER_DELAY_MS / 1000} detik`);
 
     const execPath = getExecutablePath();
     const launchOptions = {
@@ -46,16 +52,16 @@ async function takeScreenshots() {
     };
 
     if (execPath) {
-        console.log(`📌 Using browser executable: ${execPath}`);
+        console.log(`📌 Browser Executable: ${execPath}`);
         launchOptions.executablePath = execPath;
     }
 
     const browser = await puppeteer.launch(launchOptions);
 
     // ==========================================
-    // 1. PUBLIC & GUEST PAGES (TANPA LOGIN)
+    // 1. HALAMAN PUBLIK & GUEST (TANPA LOGIN)
     // ==========================================
-    console.log('\n🌐 1. CAPTURING PUBLIC & GUEST PAGES...');
+    console.log('\n🌐 1. MENANGKAP HALAMAN PUBLIK & GUEST...');
     const publicPage = await browser.newPage();
     await publicPage.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
 
@@ -70,8 +76,8 @@ async function takeScreenshots() {
     for (const p of publicPages) {
         try {
             console.log(`📸 Capturing Public: ${p.name} (${p.path})`);
-            await publicPage.goto(`${BASE_URL}${p.path}`, { waitUntil: 'networkidle0', timeout: 30000 });
-            await waitForPageRender(publicPage, 3000);
+            await publicPage.goto(`${BASE_URL}${p.path}`, { waitUntil: 'networkidle0', timeout: 45000 });
+            await waitForPageRender(publicPage, RENDER_DELAY_MS);
             await publicPage.screenshot({ path: path.join(SCREENSHOT_DIR, p.name), fullPage: true });
         } catch (e) {
             console.warn(`⚠️ Skipped ${p.name}: ${e.message}`);
@@ -79,16 +85,16 @@ async function takeScreenshots() {
     }
 
     // ==========================================
-    // 2. PORTAL WARGA (LOGIN AS WARGA)
+    // 2. PORTAL WARGA (LOGIN SEBAGAI WARGA)
     // ==========================================
-    console.log('\n🔑 2. LOGGING INTO PORTAL WARGA (warga@karduluk.desa.id)...');
+    console.log('\n🔑 2. AUTENTIKASI PORTAL WARGA (warga@karduluk.desa.id)...');
     const wargaContext = await browser.createBrowserContext();
     const wargaPage = await wargaContext.newPage();
     await wargaPage.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
 
     try {
-        await wargaPage.goto(`${BASE_URL}/portal/login`, { waitUntil: 'networkidle0', timeout: 30000 });
-        await new Promise(r => setTimeout(r, 1500));
+        await wargaPage.goto(`${BASE_URL}/portal/login`, { waitUntil: 'networkidle0', timeout: 45000 });
+        await new Promise(r => setTimeout(r, 2000));
 
         const emailInput = await wargaPage.$('input[type="email"], input[name*="email"], input[id*="email"]');
         const passwordInput = await wargaPage.$('input[type="password"], input[name*="password"], input[id*="password"]');
@@ -100,13 +106,13 @@ async function takeScreenshots() {
             const submitBtn = await wargaPage.$('button[type="submit"]');
             if (submitBtn) {
                 await submitBtn.click();
-                await wargaPage.waitForNavigation({ waitUntil: 'networkidle0', timeout: 15000 }).catch(() => {});
-                await new Promise(r => setTimeout(r, 3000));
+                await wargaPage.waitForNavigation({ waitUntil: 'networkidle0', timeout: 20000 }).catch(() => {});
+                await new Promise(r => setTimeout(r, LOGIN_DELAY_MS));
             }
         }
-        console.log(`✅ Portal Warga Current URL: ${wargaPage.url()}`);
+        console.log(`✅ Status Login Warga Sukses. URL Aktif: ${wargaPage.url()}`);
     } catch (e) {
-        console.warn('⚠️ Portal Warga Login Issue:', e.message);
+        console.warn('⚠️ Kendala Login Portal Warga:', e.message);
     }
 
     const portalPages = [
@@ -122,8 +128,8 @@ async function takeScreenshots() {
     for (const p of portalPages) {
         try {
             console.log(`📸 Capturing Portal Warga: ${p.name} (${p.path})`);
-            await wargaPage.goto(`${BASE_URL}${p.path}`, { waitUntil: 'networkidle0', timeout: 30000 });
-            await waitForPageRender(wargaPage, 3500);
+            await wargaPage.goto(`${BASE_URL}${p.path}`, { waitUntil: 'networkidle0', timeout: 45000 });
+            await waitForPageRender(wargaPage, RENDER_DELAY_MS);
             await wargaPage.screenshot({ path: path.join(SCREENSHOT_DIR, p.name), fullPage: true });
         } catch (e) {
             console.warn(`⚠️ Skipped ${p.name}: ${e.message}`);
@@ -131,18 +137,17 @@ async function takeScreenshots() {
     }
 
     // ==========================================
-    // 3. FILAMENT ADMIN PANEL (LOGIN AS ADMIN)
+    // 3. FILAMENT ADMIN PANEL (LOGIN SEBAGAI ADMIN)
     // ==========================================
-    console.log('\n🔑 3. LOGGING INTO FILAMENT ADMIN PANEL (admin@karduluk.desa.id)...');
+    console.log('\n🔑 3. AUTENTIKASI FILAMENT ADMIN PANEL (admin@karduluk.desa.id)...');
     const adminContext = await browser.createBrowserContext();
     const adminPage = await adminContext.newPage();
     await adminPage.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
 
     try {
-        await adminPage.goto(`${BASE_URL}/admin/login`, { waitUntil: 'networkidle0', timeout: 30000 });
+        await adminPage.goto(`${BASE_URL}/admin/login`, { waitUntil: 'networkidle0', timeout: 45000 });
         await new Promise(r => setTimeout(r, 2000));
 
-        // Find email & password inputs dynamically
         const inputs = await adminPage.$$('input');
         if (inputs.length >= 2) {
             await inputs[0].type('admin@karduluk.desa.id');
@@ -151,13 +156,13 @@ async function takeScreenshots() {
             const submitBtn = await adminPage.$('button[type="submit"]');
             if (submitBtn) {
                 await submitBtn.click();
-                await adminPage.waitForNavigation({ waitUntil: 'networkidle0', timeout: 15000 }).catch(() => {});
-                await new Promise(r => setTimeout(r, 3500));
+                await adminPage.waitForNavigation({ waitUntil: 'networkidle0', timeout: 20000 }).catch(() => {});
+                await new Promise(r => setTimeout(r, LOGIN_DELAY_MS));
             }
         }
-        console.log(`✅ Admin Panel Current URL: ${adminPage.url()}`);
+        console.log(`✅ Status Login Admin Sukses. URL Aktif: ${adminPage.url()}`);
     } catch (e) {
-        console.warn('⚠️ Admin Login Issue:', e.message);
+        console.warn('⚠️ Kendala Login Admin Panel:', e.message);
     }
 
     const adminPages = [
@@ -186,8 +191,8 @@ async function takeScreenshots() {
     for (const p of adminPages) {
         try {
             console.log(`📸 Capturing Admin: ${p.name} (${p.path})`);
-            await adminPage.goto(`${BASE_URL}${p.path}`, { waitUntil: 'networkidle0', timeout: 30000 });
-            await waitForPageRender(adminPage, 3500);
+            await adminPage.goto(`${BASE_URL}${p.path}`, { waitUntil: 'networkidle0', timeout: 45000 });
+            await waitForPageRender(adminPage, RENDER_DELAY_MS);
             await adminPage.screenshot({ path: path.join(SCREENSHOT_DIR, p.name), fullPage: true });
         } catch (e) {
             console.warn(`⚠️ Skipped ${p.name}: ${e.message}`);
@@ -195,7 +200,7 @@ async function takeScreenshots() {
     }
 
     await browser.close();
-    console.log(`\n🎉 All SIPADES screenshots captured & saved with extended wait time to: ${SCREENSHOT_DIR}`);
+    console.log(`\n🎉 Seluruh 32 screenshot berhasil diambil & disimpan di: ${SCREENSHOT_DIR}`);
 }
 
 takeScreenshots().catch(console.error);
