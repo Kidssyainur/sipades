@@ -2,53 +2,80 @@
 
 namespace App\Livewire\Portal;
 
-use Illuminate\Support\Facades\Auth;
+use App\Models\OtpCode;
+use App\Models\User;
+use App\Services\WhatsappGatewayService;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Layout('components.layouts.portal')]
-#[Title('Masuk')]
+#[Title('Masuk Portal Warga')]
 class PortalLogin extends Component
 {
-    public string $email = '';
+    public string $nik = '';
 
-    public string $password = '';
+    public string $no_hp = '';
 
-    public bool $remember = false;
-
-    public function login()
+    public function login(WhatsappGatewayService $waService)
     {
         $this->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
+            'nik' => ['required', 'digits:16'],
+            'no_hp' => ['required', 'string'],
+        ], [
+            'nik.required' => 'NIK wajib diisi.',
+            'nik.digits' => 'NIK harus terdiri dari 16 digit angka.',
+            'no_hp.required' => 'Nomor WhatsApp terdaftar wajib diisi.',
         ]);
 
-        if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+        $formattedNoHp = $waService->formatNoHp($this->no_hp);
+
+        /** @var User|null $user */
+        $user = User::role('warga')
+            ->where('nik', $this->nik)
+            ->where(function ($q) use ($formattedNoHp) {
+                $q->where('no_hp', $formattedNoHp)
+                  ->orWhere('no_hp', $this->no_hp);
+            })
+            ->first();
+
+        if (! $user) {
             throw ValidationException::withMessages([
-                'email' => 'Email atau kata sandi salah.',
+                'nik' => 'Kombinasi NIK dan Nomor WhatsApp tidak ditemukan pada sistem.',
             ]);
         }
-
-        $user = Auth::user();
 
         if (! $user->is_active) {
-            Auth::logout();
-
             throw ValidationException::withMessages([
-                'email' => 'Akun Anda tidak aktif. Hubungi petugas desa.',
+                'nik' => 'Akun Anda tidak aktif. Hubungi petugas desa.',
             ]);
         }
 
-        session()->regenerate();
+        // Generate & simpan OTP login (kedaluwarsa 10 menit)
+        $kode = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        // FR-02: redirect berbasis role. Warga → portal, staf → panel Filament.
-        if ($user->isWarga()) {
-            return $this->redirectRoute('portal.dashboard', navigate: true);
-        }
+        OtpCode::create([
+            'no_hp' => $formattedNoHp,
+            'email' => $user->email,
+            'kode_otp' => $kode,
+            'tipe' => 'login',
+            'kadaluarsa_pada' => now()->addMinutes(10),
+        ]);
 
-        return $this->redirect('/admin', navigate: false);
+        session()->put('login_warga', [
+            'user_id' => $user->id,
+            'nik' => $user->nik,
+            'no_hp' => $formattedNoHp,
+            'name' => $user->name,
+        ]);
+
+        // Kirim OTP via WhatsApp menggunakan template resmi
+        $waService->sendOtpMessage($formattedNoHp, $user->name, $kode, 'Masuk Portal Warga');
+
+        session()->flash('status', "Kode OTP untuk masuk telah dikirimkan ke nomor WhatsApp Anda ({$formattedNoHp}).");
+
+        return $this->redirectRoute('verifikasi-otp', navigate: true);
     }
 
     public function render()

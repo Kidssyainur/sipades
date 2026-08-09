@@ -8,7 +8,7 @@ class OtpCode extends Model
 {
     protected $table = 'otp_codes';
 
-    protected $fillable = ['email', 'kode_otp', 'tipe', 'kadaluarsa_pada', 'digunakan_pada'];
+    protected $fillable = ['email', 'no_hp', 'kode_otp', 'tipe', 'kadaluarsa_pada', 'digunakan_pada'];
 
     protected function casts(): array
     {

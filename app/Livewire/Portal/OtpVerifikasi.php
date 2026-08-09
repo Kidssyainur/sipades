@@ -5,94 +5,153 @@ namespace App\Livewire\Portal;
 use App\Models\DataKependudukan;
 use App\Models\OtpCode;
 use App\Models\User;
-use App\Mail\KodeOtpMail;
+use App\Services\WhatsappGatewayService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Layout('components.layouts.portal')]
-#[Title('Verifikasi OTP')]
+#[Title('Verifikasi OTP WhatsApp')]
 class OtpVerifikasi extends Component
 {
     public string $kode_otp = '';
 
+    public ?string $targetNoHp = null;
+
+    public ?string $targetNama = null;
+
     public function mount(): void
     {
-        // Tanpa data registrasi di session, tidak ada yang bisa diverifikasi.
-        if (! session()->has('registrasi')) {
-            $this->redirectRoute('registrasi', navigate: true);
+        if (session()->has('login_warga')) {
+            $data = session('login_warga');
+            $this->targetNoHp = $data['no_hp'] ?? null;
+            $this->targetNama = $data['name'] ?? null;
+        } elseif (session()->has('registrasi')) {
+            $data = session('registrasi');
+            $this->targetNoHp = $data['no_hp'] ?? null;
+            $this->targetNama = $data['name'] ?? null;
+        } else {
+            $this->redirectRoute('portal.login', navigate: true);
         }
     }
 
-    public function verifikasi(): void
+    public function verifikasi(WhatsappGatewayService $waService): void
     {
         $this->validate([
             'kode_otp' => ['required', 'digits:6'],
         ], [
-            'kode_otp.digits' => 'Kode OTP terdiri dari 6 digit.',
+            'kode_otp.digits' => 'Kode OTP terdiri dari 6 digit angka.',
         ]);
 
-        $registrasi = session('registrasi');
+        // Verifikasi untuk Sesi Login Warga
+        if (session()->has('login_warga')) {
+            $loginData = session('login_warga');
 
-        if (! $registrasi) {
-            $this->redirectRoute('registrasi', navigate: true);
+            $otp = OtpCode::where('no_hp', $loginData['no_hp'])
+                ->where('kode_otp', $this->kode_otp)
+                ->where('tipe', 'login')
+                ->whereNull('digunakan_pada')
+                ->latest('id')
+                ->first();
 
-            return;
-        }
+            if (! $otp || ! $otp->isValid()) {
+                $this->addError('kode_otp', 'Kode OTP WhatsApp salah atau sudah kedaluwarsa.');
 
-        $otp = OtpCode::where('email', $registrasi['email'])
-            ->where('kode_otp', $this->kode_otp)
-            ->where('tipe', 'registrasi')
-            ->whereNull('digunakan_pada')
-            ->latest('id')
-            ->first();
+                return;
+            }
 
-        if (! $otp || ! $otp->isValid()) {
-            $this->addError('kode_otp', 'Kode OTP salah atau sudah kedaluwarsa.');
-
-            return;
-        }
-
-        if (User::where('nik', $registrasi['nik'])->orWhere('email', $registrasi['email'])->exists()) {
-            $this->addError('kode_otp', 'NIK atau Email ini sudah terdaftar sebagai akun pengguna.');
-
-            return;
-        }
-
-        // Buat akun warga secara atomik — §11.1 poin 4.
-        DB::transaction(function () use ($otp, $registrasi): void {
             $otp->update(['digunakan_pada' => now()]);
 
-            $user = User::create([
-                'name' => $registrasi['name'],
-                'email' => $registrasi['email'],
-                'password' => $registrasi['password'],
-                'nik' => $registrasi['nik'],
-                'no_hp' => $registrasi['no_hp'],
-                'is_active' => true,
-                'email_verified_at' => now(),
-            ]);
+            Auth::loginUsingId($loginData['user_id']);
 
-            $user->assignRole('warga');
+            session()->forget('login_warga');
+            session()->regenerate();
+            session()->flash('status', 'Verifikasi WhatsApp berhasil! Selamat datang kembali.');
 
-            DataKependudukan::where('nik', $registrasi['nik'])
-                ->update(['sudah_didaftarkan' => true]);
-        });
+            $this->redirectRoute('portal.dashboard', navigate: true);
 
-        session()->forget('registrasi');
-        session()->flash('status', 'Verifikasi berhasil! Akun Anda telah aktif. Silakan masuk.');
+            return;
+        }
+
+        // Verifikasi untuk Sesi Registrasi Warga
+        if (session()->has('registrasi')) {
+            $registrasi = session('registrasi');
+
+            $otp = OtpCode::where('no_hp', $registrasi['no_hp'])
+                ->where('kode_otp', $this->kode_otp)
+                ->where('tipe', 'registrasi')
+                ->whereNull('digunakan_pada')
+                ->latest('id')
+                ->first();
+
+            if (! $otp || ! $otp->isValid()) {
+                $this->addError('kode_otp', 'Kode OTP WhatsApp salah atau sudah kedaluwarsa.');
+
+                return;
+            }
+
+            if (User::where('nik', $registrasi['nik'])->orWhere('no_hp', $registrasi['no_hp'])->exists()) {
+                $this->addError('kode_otp', 'NIK atau Nomor WhatsApp ini sudah terdaftar sebagai akun pengguna.');
+
+                return;
+            }
+
+            // Buat akun warga secara atomik — §11.1 poin 4.
+            DB::transaction(function () use ($otp, $registrasi): void {
+                $otp->update(['digunakan_pada' => now()]);
+
+                $user = User::create([
+                    'name' => $registrasi['name'],
+                    'email' => $registrasi['email'],
+                    'password' => $registrasi['password'],
+                    'nik' => $registrasi['nik'],
+                    'no_hp' => $registrasi['no_hp'],
+                    'is_active' => true,
+                    'email_verified_at' => now(),
+                ]);
+
+                $user->assignRole('warga');
+
+                DataKependudukan::where('nik', $registrasi['nik'])
+                    ->update(['sudah_didaftarkan' => true]);
+
+                Auth::login($user);
+            });
+
+            session()->forget('registrasi');
+            session()->regenerate();
+            session()->flash('status', 'Registrasi & Verifikasi WhatsApp berhasil! Akun Anda aktif.');
+
+            $this->redirectRoute('portal.dashboard', navigate: true);
+
+            return;
+        }
 
         $this->redirectRoute('portal.login', navigate: true);
     }
 
-    public function kirimUlang(): void
+    public function kirimUlang(WhatsappGatewayService $waService): void
     {
-        $registrasi = session('registrasi');
+        $noHp = null;
+        $nama = null;
+        $tipe = null;
 
-        if (! $registrasi) {
-            $this->redirectRoute('registrasi', navigate: true);
+        if (session()->has('login_warga')) {
+            $data = session('login_warga');
+            $noHp = $data['no_hp'];
+            $nama = $data['name'];
+            $tipe = 'login';
+        } elseif (session()->has('registrasi')) {
+            $data = session('registrasi');
+            $noHp = $data['no_hp'];
+            $nama = $data['name'];
+            $tipe = 'registrasi';
+        }
+
+        if (! $noHp || ! $tipe) {
+            $this->redirectRoute('portal.login', navigate: true);
 
             return;
         }
@@ -100,15 +159,16 @@ class OtpVerifikasi extends Component
         $kode = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
         OtpCode::create([
-            'email' => $registrasi['email'],
+            'no_hp' => $noHp,
             'kode_otp' => $kode,
-            'tipe' => 'registrasi',
+            'tipe' => $tipe,
             'kadaluarsa_pada' => now()->addMinutes(10),
         ]);
 
-        Mail::to($registrasi['email'])->send(new KodeOtpMail($kode, $registrasi['name']));
+        $tujuanTeks = ($tipe === 'login') ? 'Masuk Portal Warga' : 'Registrasi Akun Warga';
+        $waService->sendOtpMessage($noHp, $nama ?? 'Warga', $kode, $tujuanTeks);
 
-        session()->flash('status', 'Kode OTP baru telah dikirim ke email Anda.');
+        session()->flash('status', "Kode OTP baru telah dikirimkan ke nomor WhatsApp Anda ({$noHp}).");
     }
 
     public function render()

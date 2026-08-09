@@ -35,6 +35,23 @@ class WhatsappGatewayService
     }
 
     /**
+     * Kirim pesan OTP WhatsApp menggunakan Template Resmi SIPADES.
+     */
+    public function sendOtpMessage(string $noHp, string $nama, string $kodeOtp, string $tujuan = 'Autentikasi Akun'): array
+    {
+        $pesan = "🏛️ *SIPADES DESA KARDULUK*\n"
+            . "_Sistem Informasi Pelayanan Desa Karduluk_\n\n"
+            . "Halo *{$nama}*,\n\n"
+            . "Kode OTP Anda untuk *{$tujuan}* adalah:\n\n"
+            . "🔑 *{$kodeOtp}*\n\n"
+            . "⚠️ _Jangan bagikan kode OTP ini kepada siapa pun, termasuk pihak desa. Kode ini berlaku selama 10 menit._\n\n"
+            . "Terima kasih,\n"
+            . "*Pemerintah Desa Karduluk*";
+
+        return $this->send($noHp, $pesan);
+    }
+
+    /**
      * Cek status koneksi live server sidecar laravel-whatsapp.
      */
     public function checkConnectionStatus(string $sessionId = 'main'): array
