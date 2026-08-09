@@ -28,6 +28,11 @@ class LaporanDummySeeder extends Seeder
         }
 
         foreach ($penduduk as $data) {
+            // Biarkan 3 NIK ini TIDAK dibuatkan akun user agar selalu siap diuji di Form Registrasi Warga
+            if (in_array($data->nik, ['3529011506980006', '3529016012020007', '3529012504990008'])) {
+                continue;
+            }
+
             $user = User::where('nik', $data->nik)->first();
             if (! $user) {
                 $user = User::create([
