@@ -22,7 +22,7 @@ class PengajuanSuratResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $navigationLabel = 'Pengajuan Surat';
+    protected static ?string $navigationLabel = 'Semua Pengajuan';
 
     protected static ?string $modelLabel = 'Pengajuan Surat';
 
@@ -39,7 +39,7 @@ class PengajuanSuratResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return PengajuanSuratsTable::configure($table);
+        return PengajuanSuratsTable::configure($table, includeReference: false, includeLevel: true);
     }
 
     public static function getRelations(): array

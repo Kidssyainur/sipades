@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\StatusPengajuan;
+use App\Filament\Resources\PengajuanSurats\PengajuanSuratResource;
 use App\Models\PengajuanSurat;
 use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
@@ -44,22 +45,26 @@ class StatistikPengajuanOverview extends StatsOverviewWidget
             Stat::make('Total Pengajuan', number_format($total, 0, ',', '.'))
                 ->description('Seluruh pengajuan pada periode')
                 ->descriptionIcon(Heroicon::OutlinedClipboardDocumentList)
-                ->color('primary'),
+                ->color('primary')
+                ->url(PengajuanSuratResource::getUrl('index', ['activeTab' => 'semua'])),
 
             Stat::make('Dalam Proses', number_format($dalamProses, 0, ',', '.'))
                 ->description('Sedang diverifikasi / disetujui')
                 ->descriptionIcon(Heroicon::OutlinedClock)
-                ->color('warning'),
+                ->color('warning')
+                ->url(PengajuanSuratResource::getUrl('index', ['activeTab' => 'diajukan'])),
 
             Stat::make('Selesai', number_format($selesai, 0, ',', '.'))
                 ->description('Surat telah terbit')
                 ->descriptionIcon(Heroicon::OutlinedCheckCircle)
-                ->color('success'),
+                ->color('success')
+                ->url(PengajuanSuratResource::getUrl('index', ['activeTab' => 'selesai'])),
 
             Stat::make('Ditolak', number_format($ditolak, 0, ',', '.'))
                 ->description('Pengajuan ditolak')
                 ->descriptionIcon(Heroicon::OutlinedXCircle)
-                ->color('danger'),
+                ->color('danger')
+                ->url(PengajuanSuratResource::getUrl('index', ['activeTab' => 'ditolak'])),
         ];
     }
 

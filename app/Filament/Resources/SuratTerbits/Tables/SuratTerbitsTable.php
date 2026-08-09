@@ -19,6 +19,9 @@ class SuratTerbitsTable
     {
         return $table
             ->columns([
+                TextColumn::make('row_number')
+                    ->label('No.')
+                    ->rowIndex(),
                 TextColumn::make('nomor_surat')
                     ->label('Nomor Surat')
                     ->searchable()
@@ -47,7 +50,7 @@ class SuratTerbitsTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('tanggal_terbit', 'desc')
+            ->defaultSort('id', 'desc')
             ->filters([
                 Filter::make('tanggal_terbit')
                     ->schema([
@@ -60,6 +63,7 @@ class SuratTerbitsTable
                             ->when($data['sampai'] ?? null, fn (Builder $q, $tgl) => $q->whereDate('tanggal_terbit', '<=', $tgl));
                     }),
             ])
+            ->recordActionsColumnLabel('Aksi')
             ->recordActions([
                 Action::make('unduh')
                     ->label('Unduh PDF')

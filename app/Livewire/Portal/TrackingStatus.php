@@ -54,20 +54,21 @@ class TrackingStatus extends Component
             ];
         }
 
+        $isDone = in_array($status, [StatusPengajuan::SELESAI, StatusPengajuan::DISETUJUI_KEPALA], true);
+
         $tercapai = match (true) {
-            $status === StatusPengajuan::SELESAI => 4,
-            $status === StatusPengajuan::DISETUJUI_KEPALA => 3,
-            $status === StatusPengajuan::DISETUJUI_SEKRETARIS => 3,
-            $status === StatusPengajuan::DIVERIFIKASI_PETUGAS => 2,
-            default => 1,
+            $isDone => 5,
+            $status === StatusPengajuan::DISETUJUI_SEKRETARIS => 4,
+            $status === StatusPengajuan::DIVERIFIKASI_PETUGAS => 3,
+            default => 2,
         };
 
         $langkah = ['Diajukan', 'Verifikasi Petugas', 'Persetujuan Sekretaris', 'Persetujuan Kepala Desa & Terbit'];
 
         return collect($langkah)->map(fn ($label, $i) => [
             'label' => $label,
-            'selesai' => ($i + 1) < $tercapai || $status === StatusPengajuan::SELESAI,
-            'aktif' => ($i + 1) === $tercapai && $status !== StatusPengajuan::SELESAI,
+            'selesai' => ($i + 1) < $tercapai || $isDone,
+            'aktif' => ($i + 1) === $tercapai && ! $isDone,
         ])->all();
     }
 

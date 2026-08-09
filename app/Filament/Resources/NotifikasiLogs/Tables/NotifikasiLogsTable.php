@@ -80,7 +80,7 @@ class NotifikasiLogsTable
                     ->color('warning')
                     ->requiresConfirmation()
                     ->modalHeading('Kirim Ulang Notifikasi WA')
-                    ->modalDescription('Pesan akan dicoba kirim ulang secara langsung melalui Go-WA Gateway.')
+                    ->modalDescription('Pesan akan dicoba kirim ulang secara langsung melalui WhatsApp Gateway.')
                     ->visible(fn (NotifikasiLog $record): bool => in_array($record->status, ['gagal', 'pending'], true))
                     ->action(function (NotifikasiLog $record, WhatsappGatewayService $gateway): void {
                         try {
@@ -96,13 +96,13 @@ class NotifikasiLogsTable
                             if ($hasil['sukses']) {
                                 Notification::make()
                                     ->title('Pesan Berhasil Dikirim Ulang')
-                                    ->body('Go-WA merespons sukses: ' . $hasil['body'])
+                                    ->body('WhatsApp Gateway merespons sukses.')
                                     ->success()
                                     ->send();
                             } else {
                                 Notification::make()
                                     ->title('Pengiriman Ulang Gagal')
-                                    ->body('Go-WA Gateway status: ' . $hasil['status_code'])
+                                    ->body('WhatsApp Gateway status: ' . $hasil['status_code'])
                                     ->danger()
                                     ->send();
                             }

@@ -83,7 +83,7 @@ class ApprovalService
 
             // Jika level final → terbitkan surat PDF & TTE
             if ($isFinalLevel) {
-                TerbitkanSuratJob::dispatch(
+                TerbitkanSuratJob::dispatchSync(
                     pengajuanSuratId: $pengajuan->id,
                     diterbitkanOleh: $approver->id,
                 );

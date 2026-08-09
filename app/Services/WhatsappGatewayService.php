@@ -2,85 +2,68 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
+use Kstmostofa\LaravelWhatsApp\Exceptions\SidecarException;
+use Kstmostofa\LaravelWhatsApp\Facades\WhatsApp;
 
 class WhatsappGatewayService
 {
     /**
-     * Kirim pesan WhatsApp melalui Go-WA REST API Gateway (go-whatsapp-web-multidevice).
+     * Kirim pesan WhatsApp melalui laravel-whatsapp Web Sidecar backend.
      */
-    public function send(string $noHp, string $pesan): array
+    public function send(string $noHp, string $pesan, string $sessionId = 'main'): array
     {
-        $baseUrl = rtrim(config('services.gowa.url', 'http://203.145.34.217:3000/'), '/');
-        $deviceId = config('services.gowa.device_id', 'eeec6262-4b8c-4cf2-be9d-9c8ad02631b6');
-        $username = config('services.gowa.username', 'admin');
-        $password = config('services.gowa.password', 'Jitu008001');
-        $timeout = (int) config('services.gowa.timeout', 30);
-
         $formattedNoHp = $this->formatNoHp($noHp);
-        $endpoint = $baseUrl . '/send/message';
 
-        $client = Http::timeout($timeout)
-            ->acceptJson()
-            ->withBasicAuth($username, $password)
-            ->withHeaders([
-                'X-Device-Id' => $deviceId,
-            ]);
+        try {
+            $response = WhatsApp::web($sessionId)->messages()->sendText($formattedNoHp, $pesan);
 
-        // Standard JSON payload go-whatsapp-web-multidevice
-        $response = $client->post($endpoint, [
-            'phone' => $formattedNoHp,
-            'message' => $pesan,
-        ]);
-
-        return [
-            'sukses' => $response->successful(),
-            'status_code' => $response->status(),
-            'body' => $response->body(),
-            'json' => $response->json(),
-        ];
+            return [
+                'sukses' => true,
+                'status_code' => 200,
+                'body' => is_string($response) ? $response : json_encode($response),
+                'json' => is_array($response) ? $response : null,
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'sukses' => false,
+                'status_code' => 500,
+                'body' => $e->getMessage(),
+                'json' => null,
+            ];
+        }
     }
 
     /**
-     * Cek status koneksi live server Go-WA.
+     * Cek status koneksi live server sidecar laravel-whatsapp.
      */
-    public function checkConnectionStatus(): array
+    public function checkConnectionStatus(string $sessionId = 'main'): array
     {
-        $baseUrl = rtrim(config('services.gowa.url', 'http://203.145.34.217:3000/'), '/');
-        $deviceId = config('services.gowa.device_id', 'eeec6262-4b8c-4cf2-be9d-9c8ad02631b6');
-        $username = config('services.gowa.username', 'admin');
-        $password = config('services.gowa.password', 'Jitu008001');
-        $timeout = (int) config('services.gowa.timeout', 5);
-
         try {
-            $response = Http::timeout($timeout)
-                ->acceptJson()
-                ->withBasicAuth($username, $password)
-                ->withHeaders([
-                    'X-Device-Id' => $deviceId,
-                ])
-                ->get($baseUrl . '/app/devices');
+            $state = WhatsApp::web($sessionId)->state();
+            $status = $state['status'] ?? 'unknown';
 
-            if ($response->successful()) {
-                return [
-                    'online' => true,
-                    'status' => 'CONNECTED',
-                    'pesan' => 'Server Go-WA online dan terhubung.',
-                    'response' => $response->json(),
-                ];
-            }
+            $isReady = ($status === 'ready');
 
             return [
+                'online' => $isReady,
+                'status' => strtoupper($status),
+                'pesan' => $isReady
+                    ? 'Sidecar WhatsApp Web online dan terhubung (Ready).'
+                    : 'Status koneksi sidecar: ' . strtoupper($status),
+                'response' => $state,
+            ];
+        } catch (SidecarException $e) {
+            return [
                 'online' => false,
-                'status' => 'HTTP_ERROR_' . $response->status(),
-                'pesan' => 'Server merespons status: ' . $response->status(),
-                'response' => $response->body(),
+                'status' => 'UNREACHABLE',
+                'pesan' => 'Sidecar WhatsApp tidak dapat dihubungi: ' . $e->getMessage(),
+                'response' => null,
             ];
         } catch (\Throwable $e) {
             return [
                 'online' => false,
-                'status' => 'DISCONNECTED',
-                'pesan' => 'Gagal terhubung ke server Go-WA: ' . $e->getMessage(),
+                'status' => 'ERROR',
+                'pesan' => 'Gagal mengecek status WhatsApp: ' . $e->getMessage(),
                 'response' => null,
             ];
         }

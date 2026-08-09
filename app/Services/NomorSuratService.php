@@ -25,7 +25,7 @@ class NomorSuratService
         $tahun = (int) now()->format('Y');
         $bulanRomawi = self::ROMAWI[(int) now()->format('n')];
 
-        $urutan = DB::transaction(function () use ($jenisSuratId, $tahun) {
+        return DB::transaction(function () use ($jenisSuratId, $tahun, $bulanRomawi) {
             $counter = NomorSuratCounter::query()
                 ->where('jenis_surat_id', $jenisSuratId)
                 ->where('tahun', $tahun)
@@ -40,13 +40,16 @@ class NomorSuratService
                 ]);
             }
 
-            $counter->increment('nomor_terakhir');
+            do {
+                $counter->nomor_terakhir += 1;
+                $urutanFormat = str_pad((string) $counter->nomor_terakhir, 3, '0', STR_PAD_LEFT);
+                $nomorSurat = "470/{$urutanFormat}/DS-KDL/{$bulanRomawi}/{$tahun}";
+                $exists = \App\Models\SuratTerbit::where('nomor_surat', $nomorSurat)->exists();
+            } while ($exists);
 
-            return $counter->nomor_terakhir;
+            $counter->save();
+
+            return $nomorSurat;
         });
-
-        $urutanFormat = str_pad((string) $urutan, 3, '0', STR_PAD_LEFT);
-
-        return "470/{$urutanFormat}/DS-KDL/{$bulanRomawi}/{$tahun}";
     }
 }

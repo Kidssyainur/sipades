@@ -35,13 +35,4 @@ return [
         ],
     ],
 
-    'gowa' => [
-        'url' => env('GOWA_URL', 'http://203.145.34.217:3000/'),
-        'device_id' => env('GOWA_DEVICE_ID', 'eeec6262-4b8c-4cf2-be9d-9c8ad02631b6'),
-        'username' => env('GOWA_USERNAME', 'admin'),
-        'password' => env('GOWA_PASSWORD', 'Jitu008001'),
-        'timeout' => (int) env('GOWA_TIMEOUT', 30),
-    ],
-
-
 ];

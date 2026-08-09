@@ -26,13 +26,21 @@ class ListPengajuanSurats extends ListRecords
     {
         return [
             'semua' => Tab::make('Semua'),
-            'perlu_tindakan' => Tab::make('Perlu Tindakan')
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereIn('status', [
-                    StatusPengajuan::DIAJUKAN->value,
-                    StatusPengajuan::DIVERIFIKASI_PETUGAS->value,
-                    StatusPengajuan::DISETUJUI_SEKRETARIS->value,
-                ])),
+            'diajukan' => Tab::make('Diajukan (Baru)')
+                ->badge(\App\Models\PengajuanSurat::where('status', StatusPengajuan::DIAJUKAN->value)->count())
+                ->badgeColor('warning')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('status', StatusPengajuan::DIAJUKAN->value)),
+            'verifikasi_petugas' => Tab::make('Diverifikasi Petugas')
+                ->badge(\App\Models\PengajuanSurat::where('status', StatusPengajuan::DIVERIFIKASI_PETUGAS->value)->count())
+                ->badgeColor('info')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('status', StatusPengajuan::DIVERIFIKASI_PETUGAS->value)),
+            'disetujui_sekretaris' => Tab::make('Disetujui Sekdes')
+                ->badge(\App\Models\PengajuanSurat::where('status', StatusPengajuan::DISETUJUI_SEKRETARIS->value)->count())
+                ->badgeColor('info')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('status', StatusPengajuan::DISETUJUI_SEKRETARIS->value)),
             'direvisi' => Tab::make('Revisi')
+                ->badge(\App\Models\PengajuanSurat::where('status', StatusPengajuan::DIREVISI->value)->count())
+                ->badgeColor('warning')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', StatusPengajuan::DIREVISI->value)),
             'selesai' => Tab::make('Selesai')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status', StatusPengajuan::SELESAI->value)),

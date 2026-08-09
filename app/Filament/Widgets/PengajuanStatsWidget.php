@@ -3,6 +3,11 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\StatusPengajuan;
+use App\Filament\Resources\PengajuanSurats\PengajuanSuratResource;
+use App\Filament\Resources\PersetujuanKepalaResource;
+use App\Filament\Resources\PersetujuanSekretarisResource;
+use App\Filament\Resources\SuratTerbits\SuratTerbitResource;
+use App\Filament\Resources\VerifikasiPetugasResource;
 use App\Models\PengajuanSurat;
 use App\Models\SuratTerbit;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -23,22 +28,26 @@ class PengajuanStatsWidget extends BaseWidget
             Stat::make('Antrian Level 1 (Petugas)', $level1)
                 ->description('Diajukan oleh warga')
                 ->descriptionIcon('heroicon-m-clock')
-                ->color($level1 > 0 ? 'warning' : 'gray'),
+                ->color($level1 > 0 ? 'warning' : 'gray')
+                ->url(VerifikasiPetugasResource::getUrl()),
 
             Stat::make('Antrian Level 2 (Sekdes)', $level2)
                 ->description('Diverifikasi oleh Petugas')
                 ->descriptionIcon('heroicon-m-user-plus')
-                ->color($level2 > 0 ? 'info' : 'gray'),
+                ->color($level2 > 0 ? 'info' : 'gray')
+                ->url(PersetujuanSekretarisResource::getUrl()),
 
             Stat::make('Antrian Level 3 (Kepala Desa)', $level3)
                 ->description('Disetujui Sekdes & Siap TTE')
                 ->descriptionIcon('heroicon-m-pencil-square')
-                ->color($level3 > 0 ? 'primary' : 'gray'),
+                ->color($level3 > 0 ? 'primary' : 'gray')
+                ->url(PersetujuanKepalaResource::getUrl()),
 
             Stat::make('Surat Terbit (Selesai)', $totalTerbit)
                 ->description('Telah terbit & TTE')
                 ->descriptionIcon('heroicon-m-check-badge')
-                ->color('success'),
+                ->color('success')
+                ->url(SuratTerbitResource::getUrl()),
         ];
     }
 }

@@ -18,41 +18,57 @@ use Filament\Tables\Table;
 
 class PengajuanSuratsTable
 {
-    public static function configure(Table $table): Table
+    public static function configure(Table $table, bool $includeReference = false, bool $includeLevel = false): Table
     {
+        $columns = [
+            TextColumn::make('row_number')
+                ->label('No.')
+                ->rowIndex(),
+        ];
+
+        if ($includeReference) {
+            $columns[] = TextColumn::make('nomor_referensi')
+                ->label('No. Referensi')
+                ->searchable()
+                ->copyable();
+        }
+
+        $columns[] = TextColumn::make('warga.name')
+            ->label('Pemohon')
+            ->searchable()
+            ->sortable();
+
+        $columns[] = TextColumn::make('jenisSurat.nama')
+            ->label('Jenis Surat')
+            ->searchable()
+            ->sortable();
+
+        $columns[] = TextColumn::make('status')
+            ->label('Status')
+            ->badge()
+            ->formatStateUsing(fn (StatusPengajuan $state): string => $state->label())
+            ->color(fn (StatusPengajuan $state): string => $state->color());
+
+        if ($includeLevel) {
+            $columns[] = TextColumn::make('current_level')
+                ->label('Level')
+                ->badge()
+                ->sortable();
+        }
+
+        $columns[] = TextColumn::make('tanggal_pengajuan')
+            ->label('Diajukan')
+            ->dateTime('d M Y H:i')
+            ->sortable();
+
+        $columns[] = TextColumn::make('tanggal_selesai')
+            ->label('Selesai')
+            ->dateTime('d M Y H:i')
+            ->sortable()
+            ->placeholder('—');
+
         return $table
-            ->columns([
-                TextColumn::make('nomor_referensi')
-                    ->label('No. Referensi')
-                    ->searchable()
-                    ->copyable(),
-                TextColumn::make('warga.name')
-                    ->label('Pemohon')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('jenisSurat.nama')
-                    ->label('Jenis Surat')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('status')
-                    ->label('Status')
-                    ->badge()
-                    ->formatStateUsing(fn (StatusPengajuan $state): string => $state->label())
-                    ->color(fn (StatusPengajuan $state): string => $state->color()),
-                TextColumn::make('current_level')
-                    ->label('Level')
-                    ->badge()
-                    ->sortable(),
-                TextColumn::make('tanggal_pengajuan')
-                    ->label('Diajukan')
-                    ->dateTime('d M Y H:i')
-                    ->sortable(),
-                TextColumn::make('tanggal_selesai')
-                    ->label('Selesai')
-                    ->dateTime('d M Y H:i')
-                    ->sortable()
-                    ->placeholder('—'),
-            ])
+            ->columns($columns)
             ->defaultSort('tanggal_pengajuan', 'desc')
             ->filters([
                 SelectFilter::make('status')
@@ -64,6 +80,7 @@ class PengajuanSuratsTable
                     ->label('Jenis Surat')
                     ->relationship('jenisSurat', 'nama'),
             ])
+            ->recordActionsColumnLabel('Aksi')
             ->recordActions(self::recordActions());
     }
 
