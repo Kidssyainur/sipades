@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Kstmostofa\LaravelWhatsApp\Exceptions\SidecarException;
 use Kstmostofa\LaravelWhatsApp\Facades\WhatsApp;
+use Kstmostofa\LaravelWhatsApp\Web\SidecarManager;
 
 class WhatsappGatewayService
 {
@@ -40,16 +41,22 @@ class WhatsappGatewayService
     {
         try {
             $state = WhatsApp::web($sessionId)->state();
-            $status = $state['status'] ?? 'unknown';
+            $status = strtolower($state['status'] ?? 'unknown');
 
             $isReady = ($status === 'ready');
 
             return [
                 'online' => $isReady,
                 'status' => strtoupper($status),
-                'pesan' => $isReady
-                    ? 'Sidecar WhatsApp Web online dan terhubung (Ready).'
-                    : 'Status koneksi sidecar: ' . strtoupper($status),
+                'pesan' => match ($status) {
+                    'ready' => 'Sidecar WhatsApp Web online dan terhubung (Ready).',
+                    'qr' => 'Silakan scan QR Code WhatsApp di bawah ini.',
+                    'initializing' => 'Menginisialisasi browser WhatsApp Web...',
+                    'authenticated' => 'Autentikasi berhasil, memuat sesi...',
+                    'disconnected' => 'Sesi WhatsApp terputus (Disconnected).',
+                    'auth_failure' => 'Autentikasi gagal. Silakan reset/destroy sesi dan scan ulang.',
+                    default => 'Status koneksi sidecar: ' . strtoupper($status),
+                },
                 'response' => $state,
             ];
         } catch (SidecarException $e) {
@@ -67,6 +74,38 @@ class WhatsappGatewayService
                 'response' => null,
             ];
         }
+    }
+
+    /**
+     * Ambil data URI QR Code dari sidecar untuk sesi aktif.
+     */
+    public function getQrCode(string $sessionId = 'main'): ?string
+    {
+        try {
+            $qrData = WhatsApp::web($sessionId)->qr();
+
+            return $qrData['qr'] ?? null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Pastikan proses Node.js sidecar sudah berjalan. Jika belum, jalankan otomatis.
+     */
+    public function ensureSidecarRunning(): bool
+    {
+        /** @var SidecarManager $manager */
+        $manager = app(SidecarManager::class);
+
+        if (! $manager->isRunning()) {
+            if (! $manager->isInstalled()) {
+                $manager->install();
+            }
+            $manager->start();
+        }
+
+        return $manager->isRunning();
     }
 
     /**
