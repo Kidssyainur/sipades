@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\DataKependudukan;
+use App\Models\User;
 
 class NikValidationService
 {
