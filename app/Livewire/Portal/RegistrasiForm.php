@@ -34,7 +34,7 @@ class RegistrasiForm extends Component
     protected function rules(): array
     {
         return [
-            'nik' => ['required', 'digits:16'],
+            'nik' => ['required', 'digits:16', Rule::unique('users', 'nik')],
             'name' => ['required', 'string', 'max:255'],
             'no_hp' => ['required', 'string', 'max:20'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
@@ -44,6 +44,7 @@ class RegistrasiForm extends Component
 
     protected array $messages = [
         'nik.digits' => 'NIK harus terdiri dari 16 digit angka.',
+        'nik.unique' => 'NIK ini sudah terdaftar sebagai akun pengguna. Silakan login.',
         'email.unique' => 'Email ini sudah terdaftar. Silakan login.',
         'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
     ];

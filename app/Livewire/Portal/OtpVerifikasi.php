@@ -55,6 +55,12 @@ class OtpVerifikasi extends Component
             return;
         }
 
+        if (User::where('nik', $registrasi['nik'])->orWhere('email', $registrasi['email'])->exists()) {
+            $this->addError('kode_otp', 'NIK atau Email ini sudah terdaftar sebagai akun pengguna.');
+
+            return;
+        }
+
         // Buat akun warga secara atomik — §11.1 poin 4.
         DB::transaction(function () use ($otp, $registrasi): void {
             $otp->update(['digunakan_pada' => now()]);

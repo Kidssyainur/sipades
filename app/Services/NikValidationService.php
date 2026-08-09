@@ -25,7 +25,7 @@ class NikValidationService
             ];
         }
 
-        if ($penduduk->sudah_didaftarkan) {
+        if ($penduduk->sudah_didaftarkan || User::where('nik', $nik)->exists()) {
             return [
                 'valid' => false,
                 'pesan' => 'NIK ini sudah terdaftar sebagai akun. Silakan login.',
