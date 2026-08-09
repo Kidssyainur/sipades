@@ -1,5 +1,5 @@
-<x-filament-panels::page>
-    <div wire:poll.3s="cekStatusKoneksi" class="space-y-6">
+<x-filament-panels::page wire:poll.2s="cekStatusKoneksi">
+    <div class="space-y-6">
         <!-- Live Connection Status & Session Manager Card -->
         <x-filament::section icon="heroicon-o-chat-bubble-left-right">
             <x-slot name="heading">
@@ -9,7 +9,7 @@
                 Backend: whatsapp-web.js (Node.js Sidecar) &bull; Session ID: <code class="font-mono text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded">{{ $sessionId }}</code>
             </x-slot>
             <x-slot name="headerEnd">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2" wire:key="status-badge-container-{{ $statusKoneksi['status'] ?? 'unknown' }}">
                     @if($statusKoneksi)
                         @php
                             $statusStr = strtolower($statusKoneksi['status'] ?? 'unknown');
@@ -42,7 +42,7 @@
 
             <div class="space-y-6 pt-2">
                 <!-- Session Controls Toolbar -->
-                <div class="flex flex-wrap items-center gap-3">
+                <div class="flex flex-wrap items-center gap-3" wire:key="session-toolbar-{{ $statusKoneksi['status'] ?? 'unknown' }}">
                     <x-filament::button wire:click="startSession" color="success" icon="heroicon-o-qr-code">
                         Start / Pairing QR
                     </x-filament::button>
@@ -67,7 +67,7 @@
                 </div>
 
                 <!-- Context Info Notice Callout -->
-                <div>
+                <div wire:key="notice-callout-container-{{ $statusKoneksi['status'] ?? 'unknown' }}">
                     @if(isset($statusKoneksi['online']) && $statusKoneksi['online'])
                         <div class="p-4 rounded-xl border border-emerald-300 bg-emerald-50/50 dark:border-emerald-800 dark:bg-emerald-950/30 flex items-start gap-3">
                             <x-heroicon-o-check-circle class="h-6 w-6 text-emerald-600 dark:text-emerald-400 shrink-0" style="width: 1.5rem; height: 1.5rem;" />

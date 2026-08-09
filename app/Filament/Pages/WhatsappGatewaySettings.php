@@ -68,7 +68,7 @@ class WhatsappGatewaySettings extends Page implements HasForms, HasActions
                 $this->qr = $fetchedQr;
             }
         } elseif ($statusStr === 'ready') {
-            if ($this->isQrModalOpen) {
+            if ($this->isQrModalOpen || ! empty($this->qr)) {
                 $this->isQrModalOpen = false;
                 $this->dispatch('close-modal', id: 'qr-pairing-modal');
                 Notification::make()
