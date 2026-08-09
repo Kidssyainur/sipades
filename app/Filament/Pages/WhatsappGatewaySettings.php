@@ -5,21 +5,24 @@ namespace App\Filament\Pages;
 use App\Models\NotifikasiLog;
 use App\Services\WhatsappGatewayService;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Kstmostofa\LaravelWhatsApp\Facades\WhatsApp;
 use UnitEnum;
 
-class WhatsappGatewaySettings extends Page implements HasForms
+class WhatsappGatewaySettings extends Page implements HasForms, HasActions
 {
     use InteractsWithForms;
+    use InteractsWithActions;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPaperAirplane;
 
@@ -37,7 +40,7 @@ class WhatsappGatewaySettings extends Page implements HasForms
 
     public ?string $qr = null;
 
-    public bool $showQrModal = false;
+    public bool $isQrModalOpen = false;
 
     public ?array $data = [];
 
@@ -65,8 +68,9 @@ class WhatsappGatewaySettings extends Page implements HasForms
                 $this->qr = $fetchedQr;
             }
         } elseif ($statusStr === 'ready') {
-            if ($this->showQrModal) {
-                $this->showQrModal = false;
+            if ($this->isQrModalOpen) {
+                $this->isQrModalOpen = false;
+                $this->unmountAction();
                 Notification::make()
                     ->title('WhatsApp Berhasil Terhubung!')
                     ->body('Pairing sukses. Sesi WhatsApp sudah aktif dan siap mengirim pesan.')
@@ -77,110 +81,155 @@ class WhatsappGatewaySettings extends Page implements HasForms
         }
     }
 
-    public function startSidecarNodeProcess(WhatsappGatewayService $gateway): void
+    public function startSessionAction(): Action
     {
-        try {
-            $gateway->ensureSidecarRunning();
-            $this->cekStatusKoneksi($gateway);
+        return Action::make('startSession')
+            ->label('Start / Pairing QR')
+            ->icon('heroicon-o-qr-code')
+            ->color('success')
+            ->action(function (WhatsappGatewayService $gateway) {
+                try {
+                    $gateway->ensureSidecarRunning();
+                    $response = WhatsApp::web($this->sessionId)->start();
 
-            Notification::make()
-                ->title('Proses Sidecar Node.js Berjalan')
-                ->body('Server sidecar HTTP 127.0.0.1:3000 siap menerima permintaan.')
-                ->success()
-                ->send();
-        } catch (\Throwable $e) {
-            Notification::make()
-                ->title('Gagal Menjalankan Sidecar Node.js')
-                ->body($e->getMessage())
-                ->danger()
-                ->send();
-        }
+                    $this->qr = $response['qr'] ?? null;
+                    $status = strtolower($response['status'] ?? 'qr');
+
+                    if (empty($this->qr) && in_array($status, ['qr', 'initializing'])) {
+                        $this->qr = $gateway->getQrCode($this->sessionId);
+                    }
+
+                    $this->cekStatusKoneksi($gateway);
+
+                    if ($status === 'ready') {
+                        $this->isQrModalOpen = false;
+                        Notification::make()
+                            ->title('WhatsApp Sudah Terhubung!')
+                            ->body('Perangkat Anda sudah aktif. Jika ingin menghubungkan HP/nomor baru, klik Reset Pairing (Hapus Sesi).')
+                            ->info()
+                            ->send();
+                    } else {
+                        $this->isQrModalOpen = true;
+                        $this->mountAction('showQrModal');
+                    }
+                } catch (\Throwable $e) {
+                    Notification::make()
+                        ->title('Gagal Memulai Sesi')
+                        ->body($e->getMessage())
+                        ->danger()
+                        ->send();
+                }
+            });
+    }
+
+    public function showQrModalAction(): Action
+    {
+        return Action::make('showQrModal')
+            ->label('Lihat QR Code')
+            ->icon('heroicon-o-qr-code')
+            ->color('warning')
+            ->modalHeading('Pairing Perangkat WhatsApp')
+            ->modalDescription('Arahkan kamera aplikasi WhatsApp di smartphone Anda ke QR Code berikut.')
+            ->modalContent(fn () => view('filament.pages.partials.qr-modal-content', ['qr' => $this->qr]))
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Tutup Modal')
+            ->action(fn () => null);
+    }
+
+    public function destroySessionAction(): Action
+    {
+        return Action::make('destroySession')
+            ->label('Reset Pairing (Hapus Sesi)')
+            ->icon('heroicon-o-trash')
+            ->color('danger')
+            ->requiresConfirmation()
+            ->modalHeading('Reset Pairing WhatsApp?')
+            ->modalDescription('Apakah Anda yakin ingin me-reset (hapus) sesi WhatsApp? Perangkat terhubung akan di-logout dan QR Code baru akan dibuat untuk scan ulang.')
+            ->modalSubmitActionLabel('Ya, Reset & Hapus Sesi')
+            ->modalIcon('heroicon-o-exclamation-triangle')
+            ->action(function (WhatsappGatewayService $gateway) {
+                try {
+                    WhatsApp::web($this->sessionId)->destroy();
+                    $this->qr = null;
+
+                    WhatsApp::web($this->sessionId)->start();
+                    $this->qr = $gateway->getQrCode($this->sessionId);
+                    $this->isQrModalOpen = true;
+                    $this->cekStatusKoneksi($gateway);
+
+                    Notification::make()
+                        ->title('Sesi Kredensial Dihapus')
+                        ->body('Kredensial lama telah di-reset. Sesi baru dibuat, silakan scan QR Code.')
+                        ->warning()
+                        ->send();
+
+                    $this->mountAction('showQrModal');
+                } catch (\Throwable $e) {
+                    Notification::make()->title('Gagal Menghapus Sesi')->body($e->getMessage())->danger()->send();
+                }
+            });
+    }
+
+    public function stopSessionAction(): Action
+    {
+        return Action::make('stopSession')
+            ->label('Stop Sesi')
+            ->icon('heroicon-o-pause')
+            ->color('gray')
+            ->action(function (WhatsappGatewayService $gateway) {
+                try {
+                    WhatsApp::web($this->sessionId)->stop();
+                    $this->qr = null;
+                    $this->isQrModalOpen = false;
+                    $this->unmountAction();
+                    $this->cekStatusKoneksi($gateway);
+
+                    Notification::make()->title('Sesi WhatsApp Dihentikan')->info()->send();
+                } catch (\Throwable $e) {
+                    Notification::make()->title('Gagal Menghentikan Sesi')->body($e->getMessage())->danger()->send();
+                }
+            });
+    }
+
+    public function startSidecarAction(): Action
+    {
+        return Action::make('startSidecarNodeProcess')
+            ->label('Jalankan Sidecar Node.js')
+            ->icon('heroicon-o-play')
+            ->color('info')
+            ->action(function (WhatsappGatewayService $gateway) {
+                try {
+                    $gateway->ensureSidecarRunning();
+                    $this->cekStatusKoneksi($gateway);
+
+                    Notification::make()
+                        ->title('Proses Sidecar Node.js Berjalan')
+                        ->body('Server sidecar HTTP 127.0.0.1:3000 siap menerima permintaan.')
+                        ->success()
+                        ->send();
+                } catch (\Throwable $e) {
+                    Notification::make()
+                        ->title('Gagal Menjalankan Sidecar Node.js')
+                        ->body($e->getMessage())
+                        ->danger()
+                        ->send();
+                }
+            });
     }
 
     public function startSession(WhatsappGatewayService $gateway): void
     {
-        try {
-            $gateway->ensureSidecarRunning();
-
-            $response = WhatsApp::web($this->sessionId)->start();
-
-            $this->qr = $response['qr'] ?? null;
-            $status = strtolower($response['status'] ?? 'qr');
-
-            if (empty($this->qr) && in_array($status, ['qr', 'initializing'])) {
-                $this->qr = $gateway->getQrCode($this->sessionId);
-            }
-
-            $this->cekStatusKoneksi($gateway);
-
-            if ($status === 'ready') {
-                $this->showQrModal = false;
-                Notification::make()
-                    ->title('WhatsApp Sudah Terhubung!')
-                    ->body('Perangkat Anda sudah aktif. Jika ingin menghubungkan HP/nomor baru, klik Destroy (Hapus Sesi).')
-                    ->info()
-                    ->send();
-            } else {
-                $this->showQrModal = true;
-                Notification::make()
-                    ->title('Sesi QR Pairing Dimulai')
-                    ->body('Silakan scan QR Code yang muncul di layar dengan aplikasi WhatsApp HP Anda.')
-                    ->success()
-                    ->send();
-            }
-        } catch (\Throwable $e) {
-            Notification::make()
-                ->title('Gagal Memulai Sesi')
-                ->body($e->getMessage())
-                ->danger()
-                ->send();
-        }
-    }
-
-    public function openQrModal(WhatsappGatewayService $gateway): void
-    {
-        $this->cekStatusKoneksi($gateway);
-        $this->showQrModal = true;
-    }
-
-    public function closeQrModal(): void
-    {
-        $this->showQrModal = false;
-    }
-
-    public function stopSession(WhatsappGatewayService $gateway): void
-    {
-        try {
-            WhatsApp::web($this->sessionId)->stop();
-            $this->qr = null;
-            $this->showQrModal = false;
-            $this->cekStatusKoneksi($gateway);
-
-            Notification::make()->title('Sesi WhatsApp Dihentikan')->info()->send();
-        } catch (\Throwable $e) {
-            Notification::make()->title('Gagal Menghentikan Sesi')->body($e->getMessage())->danger()->send();
-        }
+        $this->startSessionAction()->call(['gateway' => $gateway]);
     }
 
     public function destroySession(WhatsappGatewayService $gateway): void
     {
-        try {
-            WhatsApp::web($this->sessionId)->destroy();
-            $this->qr = null;
+        $this->destroySessionAction()->call(['gateway' => $gateway]);
+    }
 
-            WhatsApp::web($this->sessionId)->start();
-            $this->qr = $gateway->getQrCode($this->sessionId);
-            $this->showQrModal = true;
-            $this->cekStatusKoneksi($gateway);
-
-            Notification::make()
-                ->title('Sesi Kredensial Dihapus')
-                ->body('Kredensial lama telah di-reset. Sesi baru dibuat, silakan scan QR Code.')
-                ->warning()
-                ->send();
-        } catch (\Throwable $e) {
-            Notification::make()->title('Gagal Menghapus Sesi')->body($e->getMessage())->danger()->send();
-        }
+    public function stopSession(WhatsappGatewayService $gateway): void
+    {
+        $this->stopSessionAction()->call(['gateway' => $gateway]);
     }
 
     public function form(Schema $schema): Schema
