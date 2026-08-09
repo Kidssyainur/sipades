@@ -70,6 +70,7 @@ class WhatsappGatewaySettings extends Page implements HasForms, HasActions
         } elseif ($statusStr === 'ready') {
             if ($this->isQrModalOpen) {
                 $this->isQrModalOpen = false;
+                $this->dispatch('close-modal', id: 'qr-pairing-modal');
                 Notification::make()
                     ->title('WhatsApp Berhasil Terhubung!')
                     ->body('Pairing sukses. Sesi WhatsApp sudah aktif dan siap mengirim pesan.')
@@ -83,11 +84,13 @@ class WhatsappGatewaySettings extends Page implements HasForms, HasActions
     public function openQrModal(): void
     {
         $this->isQrModalOpen = true;
+        $this->dispatch('open-modal', id: 'qr-pairing-modal');
     }
 
     public function closeQrModal(): void
     {
         $this->isQrModalOpen = false;
+        $this->dispatch('close-modal', id: 'qr-pairing-modal');
     }
 
     public function startSession(WhatsappGatewayService $gateway): void
@@ -107,6 +110,7 @@ class WhatsappGatewaySettings extends Page implements HasForms, HasActions
 
             if ($status === 'ready') {
                 $this->isQrModalOpen = false;
+                $this->dispatch('close-modal', id: 'qr-pairing-modal');
                 Notification::make()
                     ->title('WhatsApp Sudah Terhubung!')
                     ->body('Perangkat Anda sudah aktif. Jika ingin menghubungkan HP/nomor baru, klik Reset Pairing (Hapus Sesi).')
@@ -114,6 +118,7 @@ class WhatsappGatewaySettings extends Page implements HasForms, HasActions
                     ->send();
             } else {
                 $this->isQrModalOpen = true;
+                $this->dispatch('open-modal', id: 'qr-pairing-modal');
                 Notification::make()
                     ->title('Sesi QR Pairing Dimulai')
                     ->body('Silakan scan QR Code yang muncul di layar dengan aplikasi WhatsApp HP Anda.')
@@ -135,6 +140,7 @@ class WhatsappGatewaySettings extends Page implements HasForms, HasActions
             WhatsApp::web($this->sessionId)->stop();
             $this->qr = null;
             $this->isQrModalOpen = false;
+            $this->dispatch('close-modal', id: 'qr-pairing-modal');
             $this->cekStatusKoneksi($gateway);
 
             Notification::make()->title('Sesi WhatsApp Dihentikan')->info()->send();
@@ -182,6 +188,7 @@ class WhatsappGatewaySettings extends Page implements HasForms, HasActions
                     WhatsApp::web($this->sessionId)->start();
                     $this->qr = $gateway->getQrCode($this->sessionId);
                     $this->isQrModalOpen = true;
+                    $this->dispatch('open-modal', id: 'qr-pairing-modal');
                     $this->cekStatusKoneksi($gateway);
 
                     Notification::make()

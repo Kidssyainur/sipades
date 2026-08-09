@@ -48,7 +48,7 @@
                     </x-filament::button>
 
                     @if($qr)
-                        <x-filament::button wire:click="openQrModal" color="warning" icon="heroicon-o-qr-code">
+                        <x-filament::button wire:click="openQrModal" x-on:click="$dispatch('open-modal', { id: 'qr-pairing-modal' })" color="warning" icon="heroicon-o-qr-code">
                             Lihat QR Code
                         </x-filament::button>
                     @endif
@@ -126,7 +126,6 @@
     <!-- Native Filament Modal Component for Floating Centered QR Code Pop-up -->
     <x-filament::modal
         id="qr-pairing-modal"
-        :visible="$isQrModalOpen"
         width="md"
         alignment="center"
     >
@@ -173,7 +172,7 @@
 
         <x-slot name="footer">
             <div class="flex justify-end">
-                <x-filament::button color="gray" size="sm" wire:click="closeQrModal">
+                <x-filament::button color="gray" size="sm" wire:click="closeQrModal" x-on:click="$dispatch('close-modal', { id: 'qr-pairing-modal' })">
                     Tutup Modal
                 </x-filament::button>
             </div>
