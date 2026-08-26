@@ -124,6 +124,8 @@ def add_bab_heading(doc, roman, title):
     p = doc.add_paragraph()
     p.style = doc.styles["Heading 1"]
     pPr = p._p.get_or_add_pPr()
+    pb = OxmlElement("w:pageBreakBefore")
+    pPr.insert(1, pb)
     sp = _child(pPr, "w:spacing")
     sp.set(qn("w:before"), "0"); sp.set(qn("w:after"), "120")
     sp.set(qn("w:line"), "360"); sp.set(qn("w:lineRule"), "auto")
@@ -169,7 +171,7 @@ def add_body(doc, text, bold_prefix=None, italic=False):
     style_run(r, pt=12, italic=italic)
     return p
 
-def add_caption(doc, text):
+def add_caption(doc, text, bookmark=None):
     """Caption: centered, TNR 11pt bold label, before=120 after=120 line=360."""
     p = doc.add_paragraph()
     p.style = doc.styles["Caption"]
@@ -179,6 +181,14 @@ def add_caption(doc, text):
     sp.set(qn("w:line"), "360"); sp.set(qn("w:lineRule"), "auto")
     jc = _child(pPr, "w:jc"); jc.set(qn("w:val"), "center")
     ind = _child(pPr, "w:ind"); ind.set(qn("w:firstLine"), "0")
+    if bookmark:
+        BM_ID["n"] += 1
+        st = OxmlElement("w:bookmarkStart")
+        st.set(qn("w:id"), str(BM_ID["n"])); st.set(qn("w:name"), bookmark)
+        en = OxmlElement("w:bookmarkEnd")
+        en.set(qn("w:id"), str(BM_ID["n"]))
+        p._p.insert(1, st)
+        p._p.append(en)
     
     # Split caption for bold label if starts with Gambar or Tabel
     if text.startswith("Gambar ") or text.startswith("Tabel "):
@@ -195,11 +205,16 @@ def add_caption(doc, text):
 # ---------------- image insertion ----------------
 
 IMG_COUNTER = {"n": 0}
+FIG_ENTRIES = []  # (num_str, caption, bookmark) untuk Daftar Gambar
+BM_ID = {"n": 1000}
+DAFTAR_ELEMS = []  # elemen XML halaman Daftar Gambar (dipindah ke awal body)
 
 def add_figure(doc, filename, caption_text):
     IMG_COUNTER["n"] += 1
     num_str = f"Gambar 4.{IMG_COUNTER['n']}"
     full_caption = f"{num_str}  {caption_text}"
+    bm = f"gbr4_{IMG_COUNTER['n']}"
+    FIG_ENTRIES.append((num_str, caption_text, bm))
     path = os.path.join(IMG_DIR, filename)
     try:
         with Image.open(path) as im:
@@ -222,7 +237,7 @@ def add_figure(doc, filename, caption_text):
     p.alignment = AL.CENTER
     run = p.add_run()
     run.add_picture(path, width=Emu(w_emu), height=Emu(h_emu))
-    add_caption(doc, full_caption)
+    add_caption(doc, full_caption, bookmark=bm)
     return p
 
 # ---------------- black-box test table ----------------
@@ -268,13 +283,106 @@ def add_bb_table(doc, tbl_num, caption_text, rows):
             style_run(r, pt=9.5, bold=is_bold)
     return tbl
 
+# ---------------- Daftar Gambar ----------------
+
+def add_daftar_gambar(doc):
+    """Halaman 'DAFTAR GAMBAR' di awal dokumen: judul centered bold + baris
+    per gambar dengan dot leader & nomor halaman (PAGEREF field, ter-update
+    otomatis saat field di-refresh di Word)."""
+    # Judul
+    p = doc.add_paragraph()
+    p.style = doc.styles["Heading 1"]
+    pPr = p._p.get_or_add_pPr()
+    sp = _child(pPr, "w:spacing")
+    sp.set(qn("w:before"), "0"); sp.set(qn("w:after"), "240")
+    sp.set(qn("w:line"), "360"); sp.set(qn("w:lineRule"), "auto")
+    jc = _child(pPr, "w:jc"); jc.set(qn("w:val"), "center")
+    r = p.add_run("DAFTAR GAMBAR"); style_run(r, pt=12, bold=True)
+    DAFTAR_ELEMS.append(p._p)
+
+    # Baris kosong setelah judul
+    blank = doc.add_paragraph()
+    set_spacing(blank, before=0, after=0, line=360)
+    DAFTAR_ELEMS.append(blank._p)
+
+    # Satu baris per gambar: "Gambar 4.N  Caption ..... <PAGEREF>"
+    for num_str, caption_text, bm in FIG_ENTRIES:
+        ep = doc.add_paragraph()
+        ep.style = doc.styles["Normal"]
+        set_spacing(ep, before=0, after=0, line=360)
+        epPr = ep._p.get_or_add_pPr()
+        tabs = OxmlElement("w:tabs")
+        tab = OxmlElement("w:tab")
+        tab.set(qn("w:val"), "right")
+        tab.set(qn("w:leader"), "dot")
+        tab.set(qn("w:pos"), "7938")  # ~14 cm, batas kanan margin teks
+        tabs.append(tab)
+        epPr.append(tabs)
+
+        r1 = ep.add_run(f"{num_str}  {caption_text}")
+        style_run(r1, pt=12)
+
+        r_tab = ep.add_run(); r_tab._r.append(OxmlElement("w:tab"))
+
+        # PAGEREF field menuju bookmark caption
+        fld_begin = OxmlElement("w:r"); fc = OxmlElement("w:fldChar")
+        fc.set(qn("w:fldCharType"), "begin"); fld_begin.append(fc)
+        r_instr = OxmlElement("w:r"); it = OxmlElement("w:instrText")
+        it.set(qn("xml:space"), "preserve")
+        it.text = f" PAGEREF {bm} \\h "
+        r_instr.append(it)
+        r_sep = OxmlElement("w:r"); fc2 = OxmlElement("w:fldChar")
+        fc2.set(qn("w:fldCharType"), "separate"); r_sep.append(fc2)
+        r_val = ep.add_run("0"); style_run(r_val, pt=12)
+        r_end = OxmlElement("w:r"); fc3 = OxmlElement("w:fldChar")
+        fc3.set(qn("w:fldCharType"), "end"); r_end.append(fc3)
+        for el in (fld_begin, r_instr, r_sep, r_val._r, r_end):
+            ep._p.append(el)
+        DAFTAR_ELEMS.append(ep._p)
+
+
+def move_daftar_gambar_to_front(doc):
+    """Pindahkan elemen halaman Daftar Gambar ke awal body dokumen.
+    (Dibangun di akhir karena entri baru lengkap setelah semua figure dibuat.)"""
+    body = doc.element.body
+    for el in DAFTAR_ELEMS:
+        body.remove(el)
+    for i, el in enumerate(DAFTAR_ELEMS):
+        body.insert(i, el)
+
+
+def enable_update_fields(out_path):
+    """Tambahkan <w:updateFields w:val="true"/> di settings.xml agar Word
+    meminta pembaruan field (PAGEREF) saat dokumen dibuka pertama kali."""
+    import zipfile, shutil, re
+    tmp = out_path + ".tmp"
+    with zipfile.ZipFile(out_path) as zin:
+        infos = zin.infolist()
+        contents = {i.filename: zin.read(i.filename) for i in infos}
+    settings = contents["word/settings.xml"].decode("utf-8")
+    if "updateFields" not in settings:
+        # Sisipkan sebelum </w:settings> (posisi aman; Word merapikan urutan saat save)
+        settings = settings.replace("</w:settings>", '<w:updateFields w:val="true"/></w:settings>')
+        contents["word/settings.xml"] = settings.encode("utf-8")
+    with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as zout:
+        for info in infos:
+            zout.writestr(info, contents[info.filename])
+    shutil.move(tmp, out_path)
+
+
 # ---------------- DOCUMENT GENERATOR MAIN ----------------
 
 def generate_docx():
+    # Reset state global agar fungsi idempoten (bisa dipanggil berulang)
+    IMG_COUNTER["n"] = 0
+    FIG_ENTRIES.clear()
+    BM_ID["n"] = 1000
+    DAFTAR_ELEMS.clear()
+
     doc = Document()
     setup_page(doc)
     add_page_footer(doc)
-    
+
     print("Generating BAB IV...")
     
     # ---------------- BAB IV ----------------
@@ -355,7 +463,25 @@ def generate_docx():
     
     add_figure(doc, "19_admin_pengajuan_surat_detail.png", "Halaman Detail Verifikasi & Form Persetujuan/Penolakan Permohonan")
     add_body(doc, "Verifikator (Petugas/Sekdes/Kades) dapat memeriksa keabsahan berkas lampiran warga, memberikan persetujuan (approve), meminta revisi dengan catatan, atau menolak permohonan disertai alasan resmi.")
-    
+
+    add_figure(doc, "35_admin_verifikasi_petugas_index.png", "Halaman Antrian Verifikasi Petugas Desa (Level 1)")
+    add_body(doc, "Halaman antrian verifikasi tingkat pertama menampilkan seluruh permohonan berstatus Diajukan yang menunggu pemeriksaan awal oleh Petugas Desa. Tabel dilengkapi filter status/jenis surat serta aksi keputusan (setujui, minta revisi, tolak) sesuai hak akses Level 1.")
+
+    add_figure(doc, "36_admin_verifikasi_petugas_view.png", "Halaman Detail Verifikasi Petugas Desa (Level 1)")
+    add_body(doc, "Halaman detail verifikasi petugas menyajikan ringkasan pengajuan, data pemohon, isian formulir, serta riwayat approval. Petugas dapat memberikan keputusan persetujuan, permintaan revisi, atau penolakan disertai catatan sebelum permohonan diteruskan ke level berikutnya.")
+
+    add_figure(doc, "37_admin_persetujuan_sekdes_index.png", "Halaman Antrian Persetujuan Sekretaris Desa (Level 2)")
+    add_body(doc, "Halaman antrian persetujuan Sekretaris Desa menampilkan permohonan yang telah lolos verifikasi Petugas (status Diverifikasi Petugas) dan menunggu persetujuan administratif lanjutan sebelum diteruskan kepada Kepala Desa.")
+
+    add_figure(doc, "38_admin_persetujuan_sekdes_view.png", "Halaman Detail Persetujuan Sekretaris Desa (Level 2)")
+    add_body(doc, "Halaman detail persetujuan Sekretaris Desa menampilkan berkas permohonan beserta riwayat verifikasi pada level sebelumnya, sehingga Sekdes dapat memutuskan untuk menyetujui, meminta revisi, atau menolak permohonan dengan alasan yang tercatat.")
+
+    add_figure(doc, "39_admin_persetujuan_kades_index.png", "Halaman Antrian Persetujuan Kepala Desa (Level 3 & TTE)")
+    add_body(doc, "Halaman antrian persetujuan Kepala Desa menampilkan permohonan berstatus Disetujui Sekretaris yang siap menerima pengesahan akhir beserta penandatanganan elektronik (TTE) dan penerbitan surat resmi.")
+
+    add_figure(doc, "40_admin_persetujuan_kades_view.png", "Halaman Detail Persetujuan Kepala Desa (Level 3 & TTE)")
+    add_body(doc, "Halaman detail persetujuan Kepala Desa menyajikan seluruh data pengajuan dan riwayat approval dua level sebelumnya. Persetujuan pada level ini otomatis menandatangani dokumen secara elektronik (TTE) dan menerbitkan surat resmi terverifikasi.")
+
     add_figure(doc, "20_admin_surat_terbit_index.png", "Daftar Arsip Surat Resmi Terbit Admin")
     add_body(doc, "Halaman pusat arsip digital yang menyimpan seluruh dokumen surat resmi desa yang telah diterbitkan lengkap dengan log pengesahan TTE dan nomor registrasi surat.")
     
@@ -370,7 +496,10 @@ def generate_docx():
     
     add_figure(doc, "24_admin_notifikasi_log_index.png", "Halaman Log Riwayat Pengiriman Notifikasi WhatsApp")
     add_body(doc, "Menampilkan daftar riwayat log pengiriman pesan notifikasi WhatsApp oleh gateway, mencakup nomor tujuan, waktu kirim, status pesan (terkirim/gagal), serta aksi kirim ulang (retry).")
-    
+
+    add_figure(doc, "41_admin_wa_messages_index.png", "Halaman Log Messages WhatsApp (Inbound/Outbound)")
+    add_body(doc, "Halaman log messages WhatsApp menampilkan seluruh pesan yang keluar-masuk melalui gateway (arah inbound/outbound), meliputi waktu, sesi, Chat ID, isi pesan, serta status dan ack pengiriman dari perangkat WhatsApp.")
+
     add_figure(doc, "25_admin_whatsapp_settings.png", "Halaman Pengaturan & Monitoring Status Live Go-WA Gateway")
     add_body(doc, "Admin dapat memantau status koneksi server Go-WA Gateway secara real-time (ONLINE/OFFLINE), mengonfigurasi endpoint URL API, serta melakukan tes pengiriman pesan langsung.")
     
@@ -397,6 +526,9 @@ def generate_docx():
     
     add_figure(doc, "33_admin_shield_roles_edit.png", "Formulir Edit Hak Akses Peran Pengguna")
     add_body(doc, "Halaman pembaruan hak akses peran pengguna untuk menyesuaikan struktur organisasi perangkat desa Karduluk.")
+
+    add_figure(doc, "34_admin_shield_roles_view.png", "Halaman Detail Peran & Daftar Izin Akses Pengguna")
+    add_body(doc, "Halaman detail peran menampilkan informasi lengkap sebuah role beserta daftar izin akses (permissions) yang dimilikinya, sehingga memudahkan audit terhadap hak akses tiap perangkat desa.")
 
     # 4.1.4 Implementasi Modul Utama & Logika Sistem
     add_h3(doc, "4.1.4", "Implementasi Modul Utama & Logika Sistem")
@@ -486,8 +618,13 @@ def generate_docx():
     add_body(doc, "3. Implementasi Fitur Analytics & Executive Dashboard: Penambahan modul analytics tingkat lanjut untuk memetakan demografi pemohon surat, proyeksi kepadatan layanan harian, serta indikator kinerja utama (KPI) kecepatan pelayanan tiap perangkat desa.")
     add_body(doc, "4. Peningkatan Infrastruktur & Redundansi Server: Untuk menjamin keberlanjutan layanan, disarankan menyediakan server cadangan (failover server) serta redundansi gateway notifikasi guna mengantisipasi jika terjadi gangguan pada server utama.")
 
+    print("Generating DAFTAR GAMBAR...")
+    add_daftar_gambar(doc)
+    move_daftar_gambar_to_front(doc)
+
     print(f"Saving document to {OUT}...")
     doc.save(OUT)
+    enable_update_fields(OUT)
     print("Done generating BAB IV & BAB V docx!")
 
 if __name__ == "__main__":

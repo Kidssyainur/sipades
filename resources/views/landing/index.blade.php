@@ -1,0 +1,12 @@
+<x-layouts.landing>
+    @include('landing.partials.hero')
+    @include('landing.partials.stats')
+    @include('landing.partials.profil')
+    @include('landing.partials.pemerintahan')
+    @include('landing.partials.potensi')
+    @include('landing.partials.wisata')
+    @include('landing.partials.fasilitas')
+    @include('landing.partials.berita')
+    @include('landing.partials.layanan')
+    @include('landing.partials.kontak')
+</x-landing-layout>

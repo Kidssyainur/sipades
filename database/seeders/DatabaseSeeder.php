@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             AkunAwalSeeder::class,
             DataKependudukanSeeder::class,
             LaporanDummySeeder::class,
+            BeritaSeeder::class,
         ]);
     }
 }

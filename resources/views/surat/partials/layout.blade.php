@@ -3,6 +3,14 @@
     Slot: $judul, $nomor (opsional override), $isi (HTML tubuh surat).
     Variabel global: $pengajuan, $penduduk, $data, $nomorSurat, $tanggalTerbit, $desa
 --}}
+@php
+    // Logo desa sebagai data URI (Dompdf tidak mendukung WebP; base64 paling andal).
+    $logoSuratPath = public_path('assets/logo-surat.png');
+    $logoSuratData = file_exists($logoSuratPath) ? @file_get_contents($logoSuratPath) : false;
+    $logoSuratDataUri = ($logoSuratData !== false && $logoSuratData !== '')
+        ? 'data:image/png;base64,' . base64_encode($logoSuratData)
+        : null;
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -24,6 +32,10 @@
         }
         .kop table { width: 100%; border-collapse: collapse; }
         .kop .logo { width: 90px; text-align: center; vertical-align: middle; }
+        .kop .logo img.logo-img {
+            width: 76px; height: 76px; border-radius: 50%;
+            border: 1.5px solid #000; object-fit: cover;
+        }
         .kop .logo .placeholder {
             width: 74px; height: 74px; border: 1px solid #555; border-radius: 50%;
             display: inline-block; line-height: 74px; font-size: 7pt; color: #777;
@@ -64,7 +76,11 @@
         <table>
             <tr>
                 <td class="logo">
-                    <span class="placeholder">LOGO</span>
+                    @if ($logoSuratDataUri)
+                        <img class="logo-img" src="{{ $logoSuratDataUri }}" alt="Logo {{ $desa['nama'] }}">
+                    @else
+                        <span class="placeholder">LOGO</span>
+                    @endif
                 </td>
                 <td class="teks">
                     <div class="baris1">Pemerintah Kabupaten {{ $desa['kabupaten'] }}</div>

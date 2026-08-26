@@ -7,6 +7,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title }} — SIPADES Desa Karduluk</title>
+
+    <!-- Favicon & logo desa -->
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+    <meta name="theme-color" content="#0f172a">
     
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,10 +37,11 @@
                 <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
                     <!-- Brand Logo -->
                     <a href="{{ route('portal.dashboard') }}" class="flex items-center gap-3 group">
-                        <div class="relative flex items-center justify-center h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-lg shadow-emerald-900/40 group-hover:scale-105 transition-transform duration-300">
-                            <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h6m-6 4h6m-6 4h6" />
-                            </svg>
+                        <div class="relative flex items-center justify-center h-10 w-10 overflow-hidden rounded-full bg-white shadow-lg shadow-emerald-900/40 ring-2 ring-emerald-400/50 group-hover:scale-105 transition-transform duration-300">
+                            <img src="{{ asset('assets/logo-karduluk.webp') }}"
+                                 alt="Logo Desa Karduluk"
+                                 class="h-full w-full object-cover"
+                                 onerror="this.onerror=null;this.src='{{ asset('assets/logo-karduluk.png') }}';">
                             <span class="absolute -top-1 -right-1 flex h-3 w-3">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-slate-900"></span>

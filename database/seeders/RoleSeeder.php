@@ -21,7 +21,7 @@ class RoleSeeder extends Seeder
         ];
 
         // 2. Permission standar Resource & Pages Filament
-        $resources = ['PengajuanSurat', 'JenisSurat', 'User', 'SuratTerbit', 'TemplatePesan', 'NotifikasiLog', 'Activity'];
+        $resources = ['PengajuanSurat', 'JenisSurat', 'User', 'SuratTerbit', 'TemplatePesan', 'NotifikasiLog', 'Activity', 'Berita'];
         $actions = ['ViewAny', 'View', 'Create', 'Update', 'Delete'];
         
         $resourcePermissions = [];

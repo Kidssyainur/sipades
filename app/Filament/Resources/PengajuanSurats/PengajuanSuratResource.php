@@ -39,7 +39,7 @@ class PengajuanSuratResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return PengajuanSuratsTable::configure($table, includeReference: false, includeLevel: true);
+        return PengajuanSuratsTable::configure($table, includeReference: false, includeLevel: false);
     }
 
     public static function getRelations(): array

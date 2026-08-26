@@ -5,10 +5,16 @@ import puppeteer from 'puppeteer';
 const BASE_URL = process.env.APP_URL || 'http://127.0.0.1:8000';
 const SCREENSHOT_DIR = path.resolve(process.cwd(), 'screenshots');
 
-// Waktu penungguan rendering per halaman (10000ms = 10 detik)
-const RENDER_DELAY_MS = 10000;
+// Waktu penungguan rendering per halaman (default 5000ms = 5 detik)
+const RENDER_DELAY_MS = parseInt(process.env.RENDER_DELAY_MS || '5000', 10);
 // Waktu penungguan autentikasi login (5000ms = 5 detik)
-const LOGIN_DELAY_MS = 5000;
+const LOGIN_DELAY_MS = parseInt(process.env.LOGIN_DELAY_MS || '5000', 10);
+
+// --- Konfigurasi viewport (satu layar) ---
+const VIEWPORT = { width: 1440, height: 900, deviceScaleFactor: 1 };
+// fullPage = false → screenshot hanya menangkap SATU layar (viewport),
+// tanpa auto-scroll & tanpa menggabungkan seluruh panjang halaman.
+const FULL_PAGE = false;
 
 if (!fs.existsSync(SCREENSHOT_DIR)) {
     fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
@@ -31,14 +37,15 @@ function getExecutablePath() {
     return null;
 }
 
-// Fungsi penungguan rendering sederhana (Tunggu 10 detik tanpa auto-scroll)
+// Fungsi penungguan rendering sederhana (tanpa auto-scroll)
 async function waitForPageRender(page, delayMs = RENDER_DELAY_MS) {
     await new Promise(r => setTimeout(r, delayMs));
 }
 
 async function takeScreenshots() {
     console.log('🚀 Memulai SIPADES Screenshot Generator...');
-    console.log(`⏱️ Waktu tunggu render per halaman disetel: ${RENDER_DELAY_MS / 1000} detik (Tanpa auto-scroll)`);
+    console.log(`⏱️ Waktu tunggu render per halaman: ${RENDER_DELAY_MS / 1000} detik`);
+    console.log(`🖼️  Mode: SATU LAYAR per halaman (fullPage=false, tanpa scroll)`);
 
     const execPath = getExecutablePath();
     const launchOptions = {
@@ -58,7 +65,7 @@ async function takeScreenshots() {
     // ==========================================
     console.log('\n🌐 1. MENANGKAP HALAMAN PUBLIK & GUEST...');
     const publicPage = await browser.newPage();
-    await publicPage.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
+    await publicPage.setViewport(VIEWPORT);
 
     const publicPages = [
         { name: '01_publik_landing.png', path: '/' },
@@ -74,7 +81,7 @@ async function takeScreenshots() {
             console.log(`📸 Capturing Public: ${p.name} (${p.path})`);
             await publicPage.goto(`${BASE_URL}${p.path}`, { waitUntil: 'networkidle0', timeout: 45000 });
             await waitForPageRender(publicPage, RENDER_DELAY_MS);
-            await publicPage.screenshot({ path: path.join(SCREENSHOT_DIR, p.name), fullPage: true });
+            await publicPage.screenshot({ path: path.join(SCREENSHOT_DIR, p.name), fullPage: FULL_PAGE });
         } catch (e) {
             console.warn(`⚠️ Skipped ${p.name}: ${e.message}`);
         }
@@ -86,7 +93,7 @@ async function takeScreenshots() {
     console.log('\n🔑 2. AUTENTIKASI PORTAL WARGA (warga@karduluk.desa.id)...');
     const wargaContext = await browser.createBrowserContext();
     const wargaPage = await wargaContext.newPage();
-    await wargaPage.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
+    await wargaPage.setViewport(VIEWPORT);
 
     try {
         await wargaPage.goto(`${BASE_URL}/portal/login`, { waitUntil: 'networkidle0', timeout: 45000 });
@@ -127,7 +134,7 @@ async function takeScreenshots() {
             console.log(`📸 Capturing Portal Warga: ${p.name} (${p.path})`);
             await wargaPage.goto(`${BASE_URL}${p.path}`, { waitUntil: 'networkidle0', timeout: 45000 });
             await waitForPageRender(wargaPage, RENDER_DELAY_MS);
-            await wargaPage.screenshot({ path: path.join(SCREENSHOT_DIR, p.name), fullPage: true });
+            await wargaPage.screenshot({ path: path.join(SCREENSHOT_DIR, p.name), fullPage: FULL_PAGE });
         } catch (e) {
             console.warn(`⚠️ Skipped ${p.name}: ${e.message}`);
         }
@@ -139,7 +146,7 @@ async function takeScreenshots() {
     console.log('\n🔑 3. AUTENTIKASI FILAMENT ADMIN PANEL (admin@karduluk.desa.id)...');
     const adminContext = await browser.createBrowserContext();
     const adminPage = await adminContext.newPage();
-    await adminPage.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
+    await adminPage.setViewport(VIEWPORT);
 
     try {
         await adminPage.goto(`${BASE_URL}/admin/login`, { waitUntil: 'networkidle0', timeout: 45000 });
@@ -165,27 +172,60 @@ async function takeScreenshots() {
         console.warn('⚠️ Kendala Login Admin Panel:', e.message);
     }
 
+    // Semua halaman admin (mencakup SELURUH route GET Filament panel).
+    // Record view approval dipilih berdasarkan status yang sesuai dengan
+    // filter masing-masing resource:
+    //   - verifikasi-petugas   → status "diajukan"                 (id 11)
+    //   - persetujuan-sekretaris → status "diverifikasi_petugas"   (id 17)
+    //   - persetujuan-kepalas  → status "disetujui_sekretaris"     (id 4)
     const adminPages = [
+        // Dashboard & halaman statis
         { name: '14_admin_dashboard.png', path: '/admin' },
+        { name: '26_admin_laporan.png', path: '/admin/laporan' },
+        { name: '25_admin_whatsapp_settings.png', path: '/admin/whatsapp-gateway-settings' },
+
+        // Jenis Surat
         { name: '15_admin_jenis_surat_index.png', path: '/admin/jenis-surats' },
         { name: '16_admin_jenis_surat_create.png', path: '/admin/jenis-surats/create' },
         { name: '17_admin_jenis_surat_edit.png', path: '/admin/jenis-surats/1/edit' },
+
+        // Pengajuan Surat (Semua Pengajuan)
         { name: '18_admin_pengajuan_surat_index.png', path: '/admin/pengajuan-surats' },
         { name: '19_admin_pengajuan_surat_detail.png', path: '/admin/pengajuan-surats/1' },
+
+        // Alur Persetujuan (Verifikasi Petugas → Sekdes → Kades)
+        { name: '35_admin_verifikasi_petugas_index.png', path: '/admin/verifikasi-petugas' },
+        { name: '36_admin_verifikasi_petugas_view.png', path: '/admin/verifikasi-petugas/11' },
+        { name: '37_admin_persetujuan_sekdes_index.png', path: '/admin/persetujuan-sekretaris' },
+        { name: '38_admin_persetujuan_sekdes_view.png', path: '/admin/persetujuan-sekretaris/17' },
+        { name: '39_admin_persetujuan_kades_index.png', path: '/admin/persetujuan-kepalas' },
+        { name: '40_admin_persetujuan_kades_view.png', path: '/admin/persetujuan-kepalas/4' },
+
+        // Surat Terbit
         { name: '20_admin_surat_terbit_index.png', path: '/admin/surat-terbits' },
+
+        // Template Pesan
         { name: '21_admin_template_pesan_index.png', path: '/admin/template-pesans' },
         { name: '22_admin_template_pesan_create.png', path: '/admin/template-pesans/create' },
         { name: '23_admin_template_pesan_edit.png', path: '/admin/template-pesans/1/edit' },
+
+        // Notifikasi & WhatsApp
         { name: '24_admin_notifikasi_log_index.png', path: '/admin/notifikasi-logs' },
-        { name: '25_admin_whatsapp_settings.png', path: '/admin/whatsapp-gateway-settings' },
-        { name: '26_admin_laporan.png', path: '/admin/laporan' },
+        { name: '41_admin_wa_messages_index.png', path: '/admin/wa-messages' },
+
+        // Manajemen User
         { name: '27_admin_users_index.png', path: '/admin/users' },
         { name: '28_admin_users_create.png', path: '/admin/users/create' },
         { name: '29_admin_users_edit.png', path: '/admin/users/1/edit' },
+
+        // Activity Logs
         { name: '30_admin_activity_logs.png', path: '/admin/activity-logs' },
+
+        // Shield Roles
         { name: '31_admin_shield_roles_index.png', path: '/admin/shield/roles' },
         { name: '32_admin_shield_roles_create.png', path: '/admin/shield/roles/create' },
         { name: '33_admin_shield_roles_edit.png', path: '/admin/shield/roles/1/edit' },
+        { name: '34_admin_shield_roles_view.png', path: '/admin/shield/roles/1' },
     ];
 
     for (const p of adminPages) {
@@ -193,14 +233,16 @@ async function takeScreenshots() {
             console.log(`📸 Capturing Admin: ${p.name} (${p.path})`);
             await adminPage.goto(`${BASE_URL}${p.path}`, { waitUntil: 'networkidle0', timeout: 45000 });
             await waitForPageRender(adminPage, RENDER_DELAY_MS);
-            await adminPage.screenshot({ path: path.join(SCREENSHOT_DIR, p.name), fullPage: true });
+            await adminPage.screenshot({ path: path.join(SCREENSHOT_DIR, p.name), fullPage: FULL_PAGE });
         } catch (e) {
             console.warn(`⚠️ Skipped ${p.name}: ${e.message}`);
         }
     }
 
     await browser.close();
-    console.log(`\n🎉 Seluruh 33 screenshot berhasil diambil & disimpan di: ${SCREENSHOT_DIR}`);
+
+    const total = publicPages.length + portalPages.length + adminPages.length;
+    console.log(`\n🎉 Seluruh ${total} screenshot berhasil diambil (1 layar per halaman) & disimpan di: ${SCREENSHOT_DIR}`);
 }
 
 takeScreenshots().catch(console.error);
