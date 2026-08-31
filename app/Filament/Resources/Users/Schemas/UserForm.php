@@ -31,15 +31,15 @@ class UserForm
                             ->maxLength(150),
                         TextInput::make('nik')
                             ->label('NIK')
-                            ->numeric()
+                            ->rules(['nullable', 'digits:16'])
                             ->maxLength(16)
                             ->unique(ignoreRecord: true)
                             ->helperText('16 digit sesuai KTP (opsional untuk petugas).'),
                         TextInput::make('no_hp')
-                            ->label('Nomor HP')
+                            ->label('Nomor HP / WhatsApp')
                             ->tel()
                             ->maxLength(20)
-                            ->placeholder('08xxxxxxxxxx'),
+                            ->placeholder('08xxxxxxxxxx / 628xxxxxxxxxx'),
                     ]),
 
                 Section::make('Keamanan & Akses')

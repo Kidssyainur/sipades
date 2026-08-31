@@ -1,0 +1,100 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sipades_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=sipades
+      - DB_USERNAME=sipades
+      - DB_PASSWORD=sipades_secret
+      - WHATSAPP_WEB_HOST=127.0.0.1
+      - WHATSAPP_WEB_PORT=3000
+      - WHATSAPP_WEB_NODE_BINARY=/usr/bin/node
+      - WHATSAPP_WEB_NPM_BINARY=/usr/bin/npm
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+    volumes:
+      - .:/var/www/html:z
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini:ro,z
+      - ./docker/entrypoint.sh:/usr/local/bin/docker-entrypoint.sh:ro,z
+    ports:
+      - "3000:3000"
+      - "5173:5173"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - sipades-net
+
+  web:
+    image: docker.io/library/nginx:alpine
+    container_name: sipades_web
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html:ro,z
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro,z
+    depends_on:
+      - app
+    networks:
+      - sipades-net
+
+  db:
+    image: docker.io/library/mariadb:11.4
+    container_name: sipades_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: sipades
+      MYSQL_USER: sipades
+      MYSQL_PASSWORD: sipades_secret
+      MYSQL_ROOT_PASSWORD: root_secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - sipades_db_data:/var/lib/mysql:z
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u root -proot_secret || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - sipades-net
+
+  redis:
+    image: docker.io/library/redis:alpine
+    container_name: sipades_redis
+    restart: unless-stopped
+    ports:
+      - "6389:6379"
+    volumes:
+      - sipades_redis_data:/data:z
+    networks:
+      - sipades-net
+
+  tunnel:
+    image: docker.io/cloudflare/cloudflared:latest
+    container_name: sipades_tunnel
+    restart: unless-stopped
+    command: tunnel --config /etc/cloudflared/config.yml run
+    volumes:
+      - ./docker/cloudflared/config.yml:/etc/cloudflared/config.yml:ro,z
+      - /home/quixiq/.cloudflared/83a4133f-a0c3-4247-9be9-d8d5f52abdad.json:/etc/cloudflared/credentials.json:ro,z
+    depends_on:
+      - web
+    networks:
+      - sipades-net
+
+networks:
+  sipades-net:
+    driver: bridge
+
+volumes:
+  sipades_db_data:
+  sipades_redis_data:

@@ -83,9 +83,9 @@ class ActivityLogsTable
                     ->modalCancelActionLabel('Tutup')
                     ->modalContent(fn (Activity $record) => view(
                         'filament.activity-log-detail',
-                        ['perubahan' => $record->changes()->toArray()],
+                        ['perubahan' => $record->properties?->toArray() ?? []],
                     ))
-                    ->visible(fn (Activity $record): bool => filled($record->changes()->toArray())),
+                    ->visible(fn (Activity $record): bool => ! empty($record->properties?->toArray() ?? [])),
             ])
             ->toolbarActions([]);
     }

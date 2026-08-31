@@ -22,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         ]);
 
+        // Trust all proxies for Cloudflare Tunnel & reverse proxies (HTTPS header forwarding)
+        $middleware->trustProxies(at: '*');
+
         // Ganti default route('login') (yang tidak terdefinisi) dengan halaman login portal warga.
         $middleware->redirectGuestsTo(fn () => route('portal.login'));
     })

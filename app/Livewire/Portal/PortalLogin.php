@@ -29,14 +29,22 @@ class PortalLogin extends Component
             'no_hp.required' => 'Nomor WhatsApp terdaftar wajib diisi.',
         ]);
 
-        $formattedNoHp = $waService->formatNoHp($this->no_hp);
+        $cleanInputNo = preg_replace('/[^0-9]/', '', $this->no_hp);
+        $formattedNoHp = $waService->formatNoHp($cleanInputNo);
+        $localNoHp = str_starts_with($formattedNoHp, '62') ? ('0' . substr($formattedNoHp, 2)) : $formattedNoHp;
+
+        $targetNumbers = array_unique(array_filter([
+            $formattedNoHp,
+            $localNoHp,
+            $cleanInputNo,
+            $this->no_hp,
+        ]));
 
         /** @var User|null $user */
         $user = User::role('warga')
-            ->where('nik', $this->nik)
-            ->where(function ($q) use ($formattedNoHp) {
-                $q->where('no_hp', $formattedNoHp)
-                  ->orWhere('no_hp', $this->no_hp);
+            ->where('nik', trim($this->nik))
+            ->where(function ($q) use ($targetNumbers) {
+                $q->whereIn('no_hp', $targetNumbers);
             })
             ->first();
 

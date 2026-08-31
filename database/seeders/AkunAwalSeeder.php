@@ -50,12 +50,8 @@ class AkunAwalSeeder extends Seeder
             $role = $data['role'];
             unset($data['role']);
 
-            $condition = ! empty($data['nik'])
-                ? ['nik' => $data['nik']]
-                : ['email' => $data['email']];
-
             $user = User::updateOrCreate(
-                $condition,
+                ['email' => $data['email']],
                 $data + [
                     'password' => Hash::make('password'),
                     'is_active' => true,
@@ -66,7 +62,7 @@ class AkunAwalSeeder extends Seeder
             $user->syncRoles([$role]);
 
             if ($role === 'warga' && ! empty($user->nik)) {
-                DataKependudukan::where('nik', $user->nik)->update([
+                DataKependudukan::where('nik', (string) $user->nik)->update([
                     'sudah_didaftarkan' => true,
                 ]);
             }

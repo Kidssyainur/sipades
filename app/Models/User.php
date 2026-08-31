@@ -23,6 +23,23 @@ class User extends Authenticatable implements FilamentUser
 
     protected $hidden = ['password', 'remember_token'];
 
+    protected static function booted(): void
+    {
+        static::deleting(function (User $user): void {
+            foreach ($user->pengajuanSurat()->withTrashed()->get() as $pengajuan) {
+                $pengajuan->suratTerbit()?->delete();
+                $pengajuan->approvalLogs()->delete();
+                $pengajuan->forceDelete();
+            }
+
+            if (! empty($user->nik)) {
+                DataKependudukan::where('nik', (string) $user->nik)->update([
+                    'sudah_didaftarkan' => false,
+                ]);
+            }
+        });
+    }
+
     /**
      * @return array<string, string>
      */

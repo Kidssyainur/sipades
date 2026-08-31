@@ -1,0 +1,9 @@
+tunnel: 83a4133f-a0c3-4247-9be9-d8d5f52abdad
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  - hostname: ghaibnet.co.id
+    service: http://web:80
+  - hostname: sipades.ghaibnet.co.id
+    service: http://web:80
+  - service: http_status:404
