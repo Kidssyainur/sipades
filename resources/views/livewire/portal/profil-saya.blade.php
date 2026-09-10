@@ -97,7 +97,9 @@
 
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp (Go-WA / Notifikasi)</label>
-                        <input type="text" wire:model="no_hp" placeholder="08123456789" class="w-full rounded-xl border-slate-200 bg-slate-50/50 p-3 text-xs font-semibold focus:bg-white focus:border-emerald-500 focus:ring-emerald-500 shadow-sm transition-all" />
+                        <input type="tel" wire:model="no_hp" placeholder="08123456789 / 628123456789" inputmode="numeric"
+                            oninput="this.value = this.value.replace(/[^0-9+]/g, '')"
+                            class="w-full rounded-xl border-slate-200 bg-slate-50/50 p-3 text-xs font-semibold focus:bg-white focus:border-emerald-500 focus:ring-emerald-500 shadow-sm transition-all" />
                         @error('no_hp') <span class="text-xs font-bold text-rose-600 mt-1 block">{{ $message }}</span> @enderror
                     </div>
 

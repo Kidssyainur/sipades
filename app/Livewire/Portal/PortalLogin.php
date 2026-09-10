@@ -22,11 +22,12 @@ class PortalLogin extends Component
     {
         $this->validate([
             'nik' => ['required', 'digits:16'],
-            'no_hp' => ['required', 'string'],
+            'no_hp' => ['required', 'string', 'regex:/^(\+?62|0)8[1-9][0-9]{6,11}$/'],
         ], [
             'nik.required' => 'NIK wajib diisi.',
             'nik.digits' => 'NIK harus terdiri dari 16 digit angka.',
             'no_hp.required' => 'Nomor WhatsApp terdaftar wajib diisi.',
+            'no_hp.regex' => 'Format nomor WhatsApp tidak valid. Masukkan nomor ponsel yang valid diawali 08 atau 628.',
         ]);
 
         $cleanInputNo = preg_replace('/[^0-9]/', '', $this->no_hp);

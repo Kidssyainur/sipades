@@ -54,7 +54,9 @@ class ProfilSaya extends Component
         $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id],
-            'no_hp' => ['required', 'string', 'max:20'],
+            'no_hp' => ['required', 'string', 'regex:/^(\+?62|0)8[1-9][0-9]{6,11}$/'],
+        ], [
+            'no_hp.regex' => 'Format nomor WhatsApp tidak valid. Masukkan nomor ponsel yang valid diawali 08 atau 628.',
         ]);
 
         $user->update([

@@ -7,6 +7,7 @@ use App\Models\PengajuanSurat;
 use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -48,6 +49,14 @@ class PengajuanSuratInfolist
                             ->label('')
                             ->keyLabel('Field')
                             ->valueLabel('Nilai'),
+                    ]),
+
+                Section::make('Berkas Dokumen Persyaratan & Lampiran')
+                    ->description('Dokumen persyaratan yang diunggah oleh warga pemohon.')
+                    ->schema([
+                        ViewEntry::make('lampiran')
+                            ->label('')
+                            ->view('filament.infolists.lampiran-list'),
                     ]),
 
                 Section::make('Riwayat Approval')

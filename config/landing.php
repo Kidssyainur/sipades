@@ -157,6 +157,141 @@ return [
         ],
     ],
 
+    // --- Alur Pengajuan Surat (Offline vs Online) ---
+    'alur_surat_offline' => [
+        'judul' => 'Alur Pengajuan Surat Offline (Konvensional di Balai Desa)',
+        'deskripsi' => 'Tata cara pengurusan surat secara manual dengan datang langsung ke loket pelayanan Kantor Desa Karduluk seperti sebelumnya.',
+        'jam_layanan' => [
+            'hari_kerja' => 'Senin – Kamis: 08.00 – 14.30 WIB',
+            'jumat' => 'Jumat: 08.00 – 11.30 WIB & 13.00 – 14.30 WIB',
+            'libur' => 'Sabtu, Minggu & Hari Libur Nasional Tutup',
+            'lokasi' => 'Loket Pelayanan Administrasi Umum, Balai Desa Karduluk',
+        ],
+        'berkas_wajib' => [
+            'Surat Pengantar asli dari Ketua RT / RW setempat',
+            'Fotokopi KTP Pemohon (membawa KTP asli untuk verifikasi)',
+            'Fotokopi Kartu Keluarga (KK) terbaru',
+            'Dokumen pendukung khusus sesuai jenis surat (misal: Bukti PBB, Surat Tanah, Surat Kematian, dll.)',
+            'Materai Rp10.000 (bila dipersyaratkan untuk jenis surat tertentu)',
+        ],
+        'langkah' => [
+            [
+                'tahap' => '1',
+                'judul' => 'Surat Pengantar RT / RW',
+                'deskripsi' => 'Pemohon menemui Ketua RT / RW di wilayah dusun masing-masing dengan membawa fotokopi KTP dan KK untuk memperoleh lembar Surat Pengantar resmi.',
+                'durasi' => 'Tergantung RT/RW',
+            ],
+            [
+                'tahap' => '2',
+                'judul' => 'Datang ke Balai Desa',
+                'deskripsi' => 'Mendatangi Balai Desa Karduluk pada hari & jam operasional kerja, lalu mengambil nomor antrean loket pelayanan administrasi umum.',
+                'durasi' => '10 – 30 Menit',
+            ],
+            [
+                'tahap' => '3',
+                'judul' => 'Penyerahan Berkas & Formulir Kertas',
+                'deskripsi' => 'Menyerahkan dokumen fisik (Pengantar RT/RW, fotokopi KTP & KK) kepada petugas loket dan mengisi formulir permohonan kertas secara manual.',
+                'durasi' => '15 Menit',
+            ],
+            [
+                'tahap' => '4',
+                'judul' => 'Verifikasi Data & Pengetikan Draf',
+                'deskripsi' => 'Petugas mencocokkan data pada buku induk kependudukan desa, mengetik draf surat resmi, dan mencatat nomor registrasi di Buku Agenda Surat Keluar.',
+                'durasi' => '30 – 60 Menit',
+            ],
+            [
+                'tahap' => '5',
+                'judul' => 'Paraf Sekdes & Tanda Tangan Basah Kades',
+                'deskripsi' => 'Draf surat diajukan untuk paraf verifikasi Sekretaris Desa, dilanjutkan tanda tangan basah Kepala Desa serta cap/stempel basah resmi desa.',
+                'durasi' => '1 – 3 Hari Kerja (bila Kades dinas luar)',
+            ],
+            [
+                'tahap' => '6',
+                'judul' => 'Pengambilan Surat Fisik di Loket',
+                'deskripsi' => 'Pemohon mengambil lembar fisik surat resmi yang telah bertanda tangan dan berstempel basah. Bila perlu, dilanjutkan legalisasi ke Kantor Kecamatan Pragaan.',
+                'durasi' => 'Selesai di Loket',
+            ],
+        ],
+        'catatan' => 'Layanan offline di Balai Desa tetap berjalan normal untuk melayani warga lansia atau warga yang belum terbiasa dengan gawai smartphone. Bagi warga yang menginginkan proses lebih praktis tanpa antre, disarankan memanfaatkan layanan online SIPADES.',
+    ],
+
+    'alur_surat_online' => [
+        'judul' => 'Alur Pengajuan Surat Online (SIPADES)',
+        'deskripsi' => 'Inovasi digital Desa Karduluk untuk pengurusan surat kilat dari rumah tanpa antre, kapan pun dan di mana pun.',
+        'langkah' => [
+            [
+                'tahap' => '1',
+                'judul' => 'Daftar / Masuk Akun Warga',
+                'deskripsi' => 'Buat akun dengan NIK, nama lengkap, dan nomor WhatsApp aktif. Verifikasi cepat tanpa perlu datang ke kantor desa.',
+            ],
+            [
+                'tahap' => '2',
+                'judul' => 'Pilih Jenis Surat & Isi Data',
+                'deskripsi' => 'Pilih jenis surat yang dibutuhkan dari daftar layanan. Data identitas otomatis terisi sesuai profil akun kependudukan Anda.',
+            ],
+            [
+                'tahap' => '3',
+                'judul' => 'Unggah Berkas Persyaratan Digital',
+                'deskripsi' => 'Foto atau lampirkan berkas yang dibutuhkan (KTP, KK, foto bukti pendukung) langsung dari kamera HP atau file PDF/JPG.',
+            ],
+            [
+                'tahap' => '4',
+                'judul' => 'Verifikasi & TTE Digital Kepala Desa',
+                'deskripsi' => 'Admin desa memeriksa berkas secara digital. Kepala Desa menandatangani dengan Tanda Tangan Elektronik (TTE) resmi bersertifikasi QR Code.',
+            ],
+            [
+                'tahap' => '5',
+                'judul' => 'Notifikasi WhatsApp & Unduh PDF',
+                'deskripsi' => 'Setiap pembaruan status dikabari via WhatsApp real-time. Surat resmi PDF dapat langsung diunduh dan disimpan atau dicetak.',
+            ],
+        ],
+    ],
+
+    'komparasi_layanan' => [
+        [
+            'aspek' => 'Tempat Pengajuan',
+            'offline' => 'Wajib datang fisik ke loket Balai Desa',
+            'online' => 'Fleksibel dari rumah via HP / Laptop',
+            'unggul' => 'online',
+        ],
+        [
+            'aspek' => 'Waktu Layanan',
+            'offline' => 'Terbatas jam kerja kantor (08.00 – 14.30 WIB)',
+            'online' => 'Bisa diajukan kapan saja 24/7 non-stop',
+            'unggul' => 'online',
+        ],
+        [
+            'aspek' => 'Pengisian Berkas',
+            'offline' => 'Mengisi formulir kertas tulisan tangan & fotokopi berkas',
+            'online' => 'Formulir digital otomatis & upload foto/PDF dari ponsel',
+            'unggul' => 'online',
+        ],
+        [
+            'aspek' => 'Pelacakan Status',
+            'offline' => 'Harus datang atau telepon untuk menanyakan status surat',
+            'online' => 'Notifikasi otomatis ke WhatsApp & fitur lacak resi online',
+            'unggul' => 'online',
+        ],
+        [
+            'aspek' => 'Penandatanganan',
+            'offline' => 'Tanda tangan basah manual (menunggu kehadiran Kades)',
+            'online' => 'Tanda Tangan Elektronik (TTE) ber-QR Code valid & cepat',
+            'unggul' => 'online',
+        ],
+        [
+            'aspek' => 'Pengambilan Surat',
+            'offline' => 'Harus antre kembali di loket untuk mengambil kertas fisik',
+            'online' => 'Langsung unduh file PDF asli ber-QR Code & cetak mandiri',
+            'unggul' => 'online',
+        ],
+        [
+            'aspek' => 'Biaya Pelayanan',
+            'offline' => 'Gratis (Rp 0) — sesuai ketentuan desa',
+            'online' => 'Gratis (Rp 0) — tanpa dipungut biaya apa pun',
+            'unggul' => 'imbang',
+        ],
+    ],
+
     // --- Kontak ---
     'kontak' => [
         'alamat' => 'Balai Desa / Kantor Kepala Desa Karduluk, Kec. Pragaan, Kab. Sumenep, Jawa Timur 69465',

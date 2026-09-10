@@ -38,6 +38,10 @@ class UserForm
                         TextInput::make('no_hp')
                             ->label('Nomor HP / WhatsApp')
                             ->tel()
+                            ->regex('/^(\+?62|0)8[1-9][0-9]{6,11}$/')
+                            ->validationMessages([
+                                'regex' => 'Format nomor WhatsApp harus diawali 08 atau 628 dan berupa angka (contoh: 08123456789).',
+                            ])
                             ->maxLength(20)
                             ->placeholder('08xxxxxxxxxx / 628xxxxxxxxxx'),
                     ]),

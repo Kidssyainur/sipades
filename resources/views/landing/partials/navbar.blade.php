@@ -12,8 +12,9 @@
         ]],
         ['label' => 'Berita', 'anchor' => 'berita', 'children' => []],
         ['label' => 'Layanan', 'anchor' => null, 'align' => 'right', 'children' => [
-            ['label' => 'Alur Pelayanan Desa', 'anchor' => 'layanan', 'desc' => 'Surat-menyurat & pengaduan'],
-            ['label' => 'Ajukan Surat Online', 'anchor' => null, 'route' => 'registrasi', 'desc' => 'SIPADES — tanpa antre'],
+            ['label' => 'Alur Pelayanan Online', 'anchor' => 'layanan', 'desc' => 'SIPADES 24/7 tanpa antre'],
+            ['label' => 'Alur Pelayanan Offline', 'anchor' => 'alur-offline', 'desc' => 'Datang ke loket Balai Desa'],
+            ['label' => 'Ajukan Surat Online', 'anchor' => null, 'route' => 'registrasi', 'desc' => 'Pendaftaran warga baru'],
             ['label' => 'Masuk Portal Warga', 'anchor' => null, 'route' => 'portal.login', 'desc' => 'Lacak status pengajuan'],
         ]],
         ['label' => 'Kontak', 'anchor' => 'kontak', 'children' => []],

@@ -22,8 +22,11 @@ class SuratPdfService
 
         $suratTerbitRecord = $suratTerbit ?? $pengajuan->suratTerbit;
 
-        $penduduk = $pengajuan->warga
-            ? \App\Models\DataKependudukan::where('nik', $pengajuan->warga->nik)->first()
+        // Ambil NIK pemohon langsung dari akun warga yang mengajukan
+        $nikPemohon = trim($pengajuan->warga?->nik ?? '');
+
+        $penduduk = ! empty($nikPemohon)
+            ? \App\Models\DataKependudukan::where('nik', $nikPemohon)->first()
             : null;
 
         $view = $pengajuan->jenisSurat?->template_view ?: 'surat.default';
@@ -51,6 +54,8 @@ class SuratPdfService
         ])->loadView($view, [
             'pengajuan' => $pengajuan,
             'penduduk' => $penduduk,
+            'pemohonNik' => $nikPemohon ?: ($penduduk?->nik ?: ($pengajuan->data_formulir['nik'] ?? '-')),
+            'pemohonNama' => $pengajuan->warga?->name ?: ($penduduk?->nama ?: '-'),
             'data' => $pengajuan->data_formulir ?? [],
             'nomorSurat' => $nomorSurat,
             'suratTerbit' => $suratTerbitRecord,
@@ -67,7 +72,26 @@ class SuratPdfService
 
         $path = 'surat/' . now()->format('Y/m') . '/' . Str::slug($pengajuan->nomor_referensi) . '.pdf';
 
-        Storage::disk('local')->put($path, $pdf->output());
+        // Pastikan direktori tujuan tersedia dan writable
+        $dir = dirname($path);
+        if (! Storage::disk('local')->exists($dir)) {
+            Storage::disk('local')->makeDirectory($dir);
+        }
+
+        $fullDir = Storage::disk('local')->path($dir);
+        if (is_dir($fullDir)) {
+            @chmod($fullDir, 0777);
+        }
+
+        $saved = Storage::disk('local')->put($path, $pdf->output());
+        if (! $saved) {
+            throw new \RuntimeException("Gagal menyimpan file PDF surat ke {$path}. Periksa izin tulis direktori storage.");
+        }
+
+        $fullPath = Storage::disk('local')->path($path);
+        if (file_exists($fullPath)) {
+            @chmod($fullPath, 0666);
+        }
 
         return $path;
     }

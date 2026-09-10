@@ -35,7 +35,8 @@
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                     </span>
-                    <input type="text" wire:model="no_hp" placeholder="08xxx / 628xxx"
+                    <input type="tel" wire:model="no_hp" placeholder="08xxx / 628xxx" inputmode="numeric"
+                        oninput="this.value = this.value.replace(/[^0-9+]/g, '')"
                         class="w-full rounded-xl border-slate-200 bg-slate-50/50 pl-10 pr-4 py-3 text-xs font-semibold focus:bg-white focus:border-emerald-500 focus:ring-emerald-500 shadow-sm transition-all">
                 </div>
                 @error('no_hp') <p class="mt-1 text-xs font-bold text-rose-600">{{ $message }}</p> @enderror

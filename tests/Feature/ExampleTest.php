@@ -15,5 +15,12 @@ class ExampleTest extends TestCase
         $response = $this->get('/');
 
         $response->assertStatus(200);
+        $response->assertSee('Alur Pengajuan');
+        $response->assertSee('Offline');
+        $response->assertSee('SIPADES');
+        $response->assertSee('Jam Loket');
+        $response->assertSee('Berkas Wajib');
+        $response->assertSee('Surat Pengantar RT / RW');
+        $response->assertSee('Perbandingan: Pengajuan Offline vs SIPADES Online');
     }
 }

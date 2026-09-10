@@ -30,6 +30,31 @@ class TrackingStatus extends Component
     {
         $surat = $this->pengajuan->suratTerbit;
 
+        if (! $surat && in_array($this->pengajuan->status, [StatusPengajuan::SELESAI, StatusPengajuan::DISETUJUI_KEPALA], true)) {
+            try {
+                $nomor = app(\App\Services\NomorSuratService::class)->generate($this->pengajuan->jenis_surat_id);
+                $surat = \App\Models\SuratTerbit::create([
+                    'pengajuan_surat_id' => $this->pengajuan->id,
+                    'nomor_surat' => $nomor,
+                    'diterbitkan_oleh' => 1,
+                    'file_path' => 'surat/pending.pdf',
+                    'tte_token' => 'TTE-KDL-' . strtoupper(\Illuminate\Support\Str::random(16)),
+                    'tanggal_terbit' => now(),
+                ]);
+
+                $filePath = app(\App\Services\SuratPdfService::class)->generate($this->pengajuan, $nomor, $surat);
+                $surat->update(['file_path' => $filePath]);
+
+                $this->pengajuan->update([
+                    'status' => StatusPengajuan::SELESAI,
+                    'tanggal_selesai' => now(),
+                ]);
+                $this->pengajuan->load('suratTerbit');
+            } catch (\Throwable $e) {
+                // Log/ignore silently to avoid breaking tracking UI
+            }
+        }
+
         if (! $surat) {
             return null;
         }

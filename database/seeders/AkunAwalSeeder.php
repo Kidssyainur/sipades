@@ -41,7 +41,7 @@ class AkunAwalSeeder extends Seeder
                 'name' => 'Ahmad Fauzi (Warga Uji Coba)',
                 'email' => 'warga@karduluk.desa.id',
                 'nik' => '3529010101800001',
-                'no_hp' => '6281234567890',
+                'no_hp' => env('SEEDER_WARGA_NO_HP', '6285954154437'),
                 'role' => 'warga',
             ],
         ];
