@@ -1,0 +1,793 @@
+{
+  "generated_at": "2026-09-12T18:00:50.237Z",
+  "base_url": "http://web",
+  "shared": [
+    {
+      "file": "001_UMUM_landing_publik.png",
+      "caption": "Halaman Utama (Landing Page) SIPADES Desa Karduluk",
+      "explanation": "Halaman publik sebagai pintu masuk layanan digital Desa Karduluk. Warga dapat menuju portal persuratan, melihat layanan unggulan, serta memverifikasi keabsahan surat melalui menu yang tersedia.",
+      "role": "publik"
+    },
+    {
+      "file": "002_UMUM_login_warga.png",
+      "caption": "Halaman Login Portal Warga",
+      "explanation": "Warga masuk ke portal menggunakan NIK (16 digit) dan nomor WhatsApp terdaftar. Sistem mengirimkan kode OTP ke WhatsApp sebagai verifikasi dua faktor.",
+      "role": "warga"
+    },
+    {
+      "file": "003_UMUM_verifikasi_otp.png",
+      "caption": "Verifikasi Kode OTP WhatsApp",
+      "explanation": "Kode OTP 6 digit yang dikirim melalui WhatsApp Gateway dimasukkan untuk memverifikasi kepemilikan nomor dan mengaktifkan sesi login warga.",
+      "role": "warga"
+    },
+    {
+      "file": "004_UMUM_dashboard_warga.png",
+      "caption": "Dashboard Portal Warga",
+      "explanation": "Setelah login, warga melihat ringkasan statistik pengajuan (total, dalam proses, disetujui, ditolak), pintasan layanan, dan riwayat pengajuan terbaru.",
+      "role": "warga"
+    },
+    {
+      "file": "005_UMUM_katalog_surat.png",
+      "caption": "Katalog 7 Jenis Surat Pelayanan Desa",
+      "explanation": "Langkah pertama pengajuan: warga memilih salah satu dari tujuh jenis surat yang dilayani. Setiap kartu menampilkan estimasi durasi penyelesaian dan jumlah dokumen persyaratan.",
+      "role": "warga"
+    }
+  ],
+  "letters": [
+    {
+      "kode": "DOMISILI",
+      "nama": "Surat Keterangan Domisili",
+      "level": 2,
+      "tte": true,
+      "estimasi": 2,
+      "persyaratan": [
+        "Fotokopi KTP",
+        "Fotokopi Kartu Keluarga"
+      ],
+      "screenshots": [
+        {
+          "file": "006_DOMISILI_01_formulir.png",
+          "caption": "Formulir Pengajuan Surat Keterangan Domisili (Terisi)",
+          "explanation": "Warga mengisi formulir permohonan Surat Keterangan Domisili secara digital. Sistem menampilkan kolom isian sesuai konfigurasi jenis surat, daftar dokumen persyaratan (Fotokopi KTP, Fotokopi Kartu Keluarga), serta area unggah lampiran pendukung berformat PDF/JPG/PNG maksimal 2 MB per berkas.",
+          "role": "warga"
+        },
+        {
+          "file": "007_DOMISILI_02_pratinjau.png",
+          "caption": "Pratinjau & Konfirmasi Permohonan Surat Keterangan Domisili",
+          "explanation": "Sebelum dikirim, warga meninjau ringkasan seluruh data formulir beserta jumlah lampiran yang berhasil diunggah untuk memastikan tidak ada data yang keliru.",
+          "role": "warga"
+        },
+        {
+          "file": "008_DOMISILI_03_status_awal.png",
+          "caption": "Status Awal Pengajuan Surat Keterangan Domisili (Menunggu Verifikasi Petugas)",
+          "explanation": "Setelah dikirim, pengajuan memperoleh nomor referensi unik dan berstatus \"Diajukan\". Halaman pelacakan menampilkan timeline approval yang dimulai dari antrian verifikasi Petugas Desa (Level 1).",
+          "role": "warga"
+        },
+        {
+          "file": "009_DOMISILI_04_petugas_antrian.png",
+          "caption": "Antrian Verifikasi Petugas Desa (Level 1) — Surat Keterangan Domisili",
+          "explanation": "Permohonan Surat Keterangan Domisili tampil pada antrian Verifikasi Petugas Desa (Level 1). Tabel menampilkan identitas pemohon, jenis surat, status terkini, dan tombol Keputusan yang berisi opsi Setujui, Minta Revisi, atau Tolak.",
+          "role": "petugas"
+        },
+        {
+          "file": "010_DOMISILI_05_petugas_detail.png",
+          "caption": "Detail Permohonan pada Verifikasi Petugas Desa (Level 1) — Surat Keterangan Domisili",
+          "explanation": "Verifikasi Petugas Desa (Level 1) memeriksa rincian permohonan: ringkasan status, data pemohon, isian formulir, berkas lampiran persyaratan, dan riwayat approval sebelumnya sebelum mengambil keputusan.",
+          "role": "petugas"
+        },
+        {
+          "file": "011_DOMISILI_06_petugas_modal.png",
+          "caption": "Modal Keputusan Setujui — Verifikasi Petugas Desa (Level 1)",
+          "explanation": "Verifikasi Petugas Desa (Level 1) memberikan keputusan melalui modal persetujuan beserta catatan. Setelah disetujui, permohonan otomatis diteruskan ke tahap approval berikutnya.",
+          "role": "petugas"
+        },
+        {
+          "file": "012_DOMISILI_07_petugas_hasil.png",
+          "caption": "Hasil Keputusan Verifikasi Petugas Desa (Level 1) — Surat Keterangan Domisili",
+          "explanation": "Keputusan tersimpan dan notifikasi keberhasilan muncul. Status pengajuan berpindah ke tahap berikutnya sesuai konfigurasi level approval jenis surat ini.",
+          "role": "petugas"
+        },
+        {
+          "file": "013_DOMISILI_05_status_2.png",
+          "caption": "Pelacakan Status setelah Level 1 — Surat Keterangan Domisili",
+          "explanation": "Timeline pada portal warga diperbarui secara real-time: tahap level sebelumnya selesai dan pengajuan kini menunggu keputusan pada level berikutnya (Level 2).",
+          "role": "warga"
+        },
+        {
+          "file": "014_DOMISILI_04_sekdes_antrian.png",
+          "caption": "Antrian Persetujuan Sekretaris Desa (Level 2) — Surat Keterangan Domisili",
+          "explanation": "Permohonan Surat Keterangan Domisili tampil pada antrian Persetujuan Sekretaris Desa (Level 2). Tabel menampilkan identitas pemohon, jenis surat, status terkini, dan tombol Keputusan yang berisi opsi Setujui, Minta Revisi, atau Tolak.",
+          "role": "sekdes"
+        },
+        {
+          "file": "015_DOMISILI_05_sekdes_detail.png",
+          "caption": "Detail Permohonan pada Persetujuan Sekretaris Desa (Level 2) — Surat Keterangan Domisili",
+          "explanation": "Persetujuan Sekretaris Desa (Level 2) memeriksa rincian permohonan: ringkasan status, data pemohon, isian formulir, berkas lampiran persyaratan, dan riwayat approval sebelumnya sebelum mengambil keputusan.",
+          "role": "sekdes"
+        },
+        {
+          "file": "016_DOMISILI_06_sekdes_modal.png",
+          "caption": "Modal Keputusan Setujui — Persetujuan Sekretaris Desa (Level 2)",
+          "explanation": "Persetujuan Sekretaris Desa (Level 2) memberikan keputusan melalui modal persetujuan beserta catatan. Persetujuan pada level ini sekaligus menandatangani dokumen secara elektronik (TTE) dan menerbitkan surat resmi.",
+          "role": "sekdes"
+        },
+        {
+          "file": "017_DOMISILI_07_sekdes_hasil.png",
+          "caption": "Hasil Keputusan Persetujuan Sekretaris Desa (Level 2) — Surat Keterangan Domisili",
+          "explanation": "Keputusan final tersimpan, surat resmi diterbitkan, dan status pengajuan berubah menjadi Selesai (Surat Terbit). Notifikasi WhatsApp dikirim ke warga.",
+          "role": "sekdes"
+        },
+        {
+          "file": "018_DOMISILI_08_status_selesai.png",
+          "caption": "Pelacakan Status setelah Persetujuan Final — Surat Keterangan Domisili",
+          "explanation": "Seluruh tahap approval selesai. Portal warga menampilkan banner \"Surat Telah Terbit & TTE Terverifikasi\" beserta tautan unduh PDF resmi melalui signed URL, serta riwayat catatan persetujuan dari setiap level.",
+          "role": "warga"
+        },
+        {
+          "file": "019_DOMISILI_09_surat_terbit.png",
+          "caption": "Arsip Surat Terbit — Surat Keterangan Domisili",
+          "explanation": "Surat Surat Keterangan Domisili yang telah disetujui penuh muncul pada arsip \"Surat Terbit\" milik warga, lengkap dengan nomor surat resmi dan token verifikasi TTE. Dokumen PDF dapat diunduh kapan saja melalui tautan aman (signed URL).",
+          "role": "warga"
+        },
+        {
+          "file": "020_DOMISILI_10_verifikasi_tte.png",
+          "caption": "Verifikasi Keabsahan TTE Publik — Surat Keterangan Domisili",
+          "explanation": "QR Code pada dokumen surat mengarahkan pihak penerima surat ke halaman verifikasi publik ini. Halaman membuktikan keaslian dokumen: nomor surat, tanggal terbit, identitas pemohon, serta pengesahan pejabat desa secara elektronik. Dokumen disahkan secara elektronik oleh Sekretaris Desa Karduluk selaku approver pada level akhir (Level 2).",
+          "role": "publik"
+        }
+      ]
+    },
+    {
+      "kode": "USAHA",
+      "nama": "Surat Keterangan Usaha",
+      "level": 3,
+      "tte": true,
+      "estimasi": 3,
+      "persyaratan": [
+        "Fotokopi KTP",
+        "Fotokopi Kartu Keluarga",
+        "Foto lokasi usaha"
+      ],
+      "screenshots": [
+        {
+          "file": "021_USAHA_01_formulir.png",
+          "caption": "Formulir Pengajuan Surat Keterangan Usaha (Terisi)",
+          "explanation": "Warga mengisi formulir permohonan Surat Keterangan Usaha secara digital. Sistem menampilkan kolom isian sesuai konfigurasi jenis surat, daftar dokumen persyaratan (Fotokopi KTP, Fotokopi Kartu Keluarga, Foto lokasi usaha), serta area unggah lampiran pendukung berformat PDF/JPG/PNG maksimal 2 MB per berkas.",
+          "role": "warga"
+        },
+        {
+          "file": "022_USAHA_02_pratinjau.png",
+          "caption": "Pratinjau & Konfirmasi Permohonan Surat Keterangan Usaha",
+          "explanation": "Sebelum dikirim, warga meninjau ringkasan seluruh data formulir beserta jumlah lampiran yang berhasil diunggah untuk memastikan tidak ada data yang keliru.",
+          "role": "warga"
+        },
+        {
+          "file": "023_USAHA_03_status_awal.png",
+          "caption": "Status Awal Pengajuan Surat Keterangan Usaha (Menunggu Verifikasi Petugas)",
+          "explanation": "Setelah dikirim, pengajuan memperoleh nomor referensi unik dan berstatus \"Diajukan\". Halaman pelacakan menampilkan timeline approval yang dimulai dari antrian verifikasi Petugas Desa (Level 1).",
+          "role": "warga"
+        },
+        {
+          "file": "024_USAHA_04_petugas_antrian.png",
+          "caption": "Antrian Verifikasi Petugas Desa (Level 1) — Surat Keterangan Usaha",
+          "explanation": "Permohonan Surat Keterangan Usaha tampil pada antrian Verifikasi Petugas Desa (Level 1). Tabel menampilkan identitas pemohon, jenis surat, status terkini, dan tombol Keputusan yang berisi opsi Setujui, Minta Revisi, atau Tolak.",
+          "role": "petugas"
+        },
+        {
+          "file": "025_USAHA_05_petugas_detail.png",
+          "caption": "Detail Permohonan pada Verifikasi Petugas Desa (Level 1) — Surat Keterangan Usaha",
+          "explanation": "Verifikasi Petugas Desa (Level 1) memeriksa rincian permohonan: ringkasan status, data pemohon, isian formulir, berkas lampiran persyaratan, dan riwayat approval sebelumnya sebelum mengambil keputusan.",
+          "role": "petugas"
+        },
+        {
+          "file": "026_USAHA_06_petugas_modal.png",
+          "caption": "Modal Keputusan Setujui — Verifikasi Petugas Desa (Level 1)",
+          "explanation": "Verifikasi Petugas Desa (Level 1) memberikan keputusan melalui modal persetujuan beserta catatan. Setelah disetujui, permohonan otomatis diteruskan ke tahap approval berikutnya.",
+          "role": "petugas"
+        },
+        {
+          "file": "027_USAHA_07_petugas_hasil.png",
+          "caption": "Hasil Keputusan Verifikasi Petugas Desa (Level 1) — Surat Keterangan Usaha",
+          "explanation": "Keputusan tersimpan dan notifikasi keberhasilan muncul. Status pengajuan berpindah ke tahap berikutnya sesuai konfigurasi level approval jenis surat ini.",
+          "role": "petugas"
+        },
+        {
+          "file": "028_USAHA_05_status_2.png",
+          "caption": "Pelacakan Status setelah Level 1 — Surat Keterangan Usaha",
+          "explanation": "Timeline pada portal warga diperbarui secara real-time: tahap level sebelumnya selesai dan pengajuan kini menunggu keputusan pada level berikutnya (Level 2).",
+          "role": "warga"
+        },
+        {
+          "file": "029_USAHA_04_sekdes_antrian.png",
+          "caption": "Antrian Persetujuan Sekretaris Desa (Level 2) — Surat Keterangan Usaha",
+          "explanation": "Permohonan Surat Keterangan Usaha tampil pada antrian Persetujuan Sekretaris Desa (Level 2). Tabel menampilkan identitas pemohon, jenis surat, status terkini, dan tombol Keputusan yang berisi opsi Setujui, Minta Revisi, atau Tolak.",
+          "role": "sekdes"
+        },
+        {
+          "file": "030_USAHA_05_sekdes_detail.png",
+          "caption": "Detail Permohonan pada Persetujuan Sekretaris Desa (Level 2) — Surat Keterangan Usaha",
+          "explanation": "Persetujuan Sekretaris Desa (Level 2) memeriksa rincian permohonan: ringkasan status, data pemohon, isian formulir, berkas lampiran persyaratan, dan riwayat approval sebelumnya sebelum mengambil keputusan.",
+          "role": "sekdes"
+        },
+        {
+          "file": "031_USAHA_06_sekdes_modal.png",
+          "caption": "Modal Keputusan Setujui — Persetujuan Sekretaris Desa (Level 2)",
+          "explanation": "Persetujuan Sekretaris Desa (Level 2) memberikan keputusan melalui modal persetujuan beserta catatan. Setelah disetujui, permohonan otomatis diteruskan ke tahap approval berikutnya.",
+          "role": "sekdes"
+        },
+        {
+          "file": "032_USAHA_07_sekdes_hasil.png",
+          "caption": "Hasil Keputusan Persetujuan Sekretaris Desa (Level 2) — Surat Keterangan Usaha",
+          "explanation": "Keputusan tersimpan dan notifikasi keberhasilan muncul. Status pengajuan berpindah ke tahap berikutnya sesuai konfigurasi level approval jenis surat ini.",
+          "role": "sekdes"
+        },
+        {
+          "file": "033_USAHA_05_status_3.png",
+          "caption": "Pelacakan Status setelah Level 2 — Surat Keterangan Usaha",
+          "explanation": "Timeline pada portal warga diperbarui secara real-time: tahap level sebelumnya selesai dan pengajuan kini menunggu keputusan pada level berikutnya (Level 3).",
+          "role": "warga"
+        },
+        {
+          "file": "034_USAHA_04_kades_antrian.png",
+          "caption": "Antrian Persetujuan Kepala Desa (Level 3 & TTE) — Surat Keterangan Usaha",
+          "explanation": "Permohonan Surat Keterangan Usaha tampil pada antrian Persetujuan Kepala Desa (Level 3 & TTE). Tabel menampilkan identitas pemohon, jenis surat, status terkini, dan tombol Keputusan yang berisi opsi Setujui, Minta Revisi, atau Tolak.",
+          "role": "kades"
+        },
+        {
+          "file": "035_USAHA_05_kades_detail.png",
+          "caption": "Detail Permohonan pada Persetujuan Kepala Desa (Level 3 & TTE) — Surat Keterangan Usaha",
+          "explanation": "Persetujuan Kepala Desa (Level 3 & TTE) memeriksa rincian permohonan: ringkasan status, data pemohon, isian formulir, berkas lampiran persyaratan, dan riwayat approval sebelumnya sebelum mengambil keputusan.",
+          "role": "kades"
+        },
+        {
+          "file": "036_USAHA_06_kades_modal.png",
+          "caption": "Modal Keputusan Setujui — Persetujuan Kepala Desa (Level 3 & TTE)",
+          "explanation": "Persetujuan Kepala Desa (Level 3 & TTE) memberikan keputusan melalui modal persetujuan beserta catatan. Persetujuan pada level ini sekaligus menandatangani dokumen secara elektronik (TTE) dan menerbitkan surat resmi.",
+          "role": "kades"
+        },
+        {
+          "file": "037_USAHA_07_kades_hasil.png",
+          "caption": "Hasil Keputusan Persetujuan Kepala Desa (Level 3 & TTE) — Surat Keterangan Usaha",
+          "explanation": "Keputusan final tersimpan, surat resmi diterbitkan, dan status pengajuan berubah menjadi Selesai (Surat Terbit). Notifikasi WhatsApp dikirim ke warga.",
+          "role": "kades"
+        },
+        {
+          "file": "038_USAHA_08_status_selesai.png",
+          "caption": "Pelacakan Status setelah Persetujuan Final — Surat Keterangan Usaha",
+          "explanation": "Seluruh tahap approval selesai. Portal warga menampilkan banner \"Surat Telah Terbit & TTE Terverifikasi\" beserta tautan unduh PDF resmi melalui signed URL, serta riwayat catatan persetujuan dari setiap level.",
+          "role": "warga"
+        },
+        {
+          "file": "039_USAHA_09_surat_terbit.png",
+          "caption": "Arsip Surat Terbit — Surat Keterangan Usaha",
+          "explanation": "Surat Surat Keterangan Usaha yang telah disetujui penuh muncul pada arsip \"Surat Terbit\" milik warga, lengkap dengan nomor surat resmi dan token verifikasi TTE. Dokumen PDF dapat diunduh kapan saja melalui tautan aman (signed URL).",
+          "role": "warga"
+        },
+        {
+          "file": "040_USAHA_10_verifikasi_tte.png",
+          "caption": "Verifikasi Keabsahan TTE Publik — Surat Keterangan Usaha",
+          "explanation": "QR Code pada dokumen surat mengarahkan pihak penerima surat ke halaman verifikasi publik ini. Halaman membuktikan keaslian dokumen: nomor surat, tanggal terbit, identitas pemohon, serta pengesahan pejabat desa secara elektronik. Dokumen ditandatangani secara elektronik oleh Kepala Desa Karduluk selaku approver pada level akhir (Level 3).",
+          "role": "publik"
+        }
+      ]
+    },
+    {
+      "kode": "SKTM",
+      "nama": "Surat Keterangan Tidak Mampu",
+      "level": 2,
+      "tte": true,
+      "estimasi": 2,
+      "persyaratan": [
+        "Fotokopi KTP",
+        "Fotokopi Kartu Keluarga",
+        "Surat pengantar RT/RW"
+      ],
+      "screenshots": [
+        {
+          "file": "041_SKTM_01_formulir.png",
+          "caption": "Formulir Pengajuan Surat Keterangan Tidak Mampu (Terisi)",
+          "explanation": "Warga mengisi formulir permohonan Surat Keterangan Tidak Mampu secara digital. Sistem menampilkan kolom isian sesuai konfigurasi jenis surat, daftar dokumen persyaratan (Fotokopi KTP, Fotokopi Kartu Keluarga, Surat pengantar RT/RW), serta area unggah lampiran pendukung berformat PDF/JPG/PNG maksimal 2 MB per berkas.",
+          "role": "warga"
+        },
+        {
+          "file": "042_SKTM_02_pratinjau.png",
+          "caption": "Pratinjau & Konfirmasi Permohonan Surat Keterangan Tidak Mampu",
+          "explanation": "Sebelum dikirim, warga meninjau ringkasan seluruh data formulir beserta jumlah lampiran yang berhasil diunggah untuk memastikan tidak ada data yang keliru.",
+          "role": "warga"
+        },
+        {
+          "file": "043_SKTM_03_status_awal.png",
+          "caption": "Status Awal Pengajuan Surat Keterangan Tidak Mampu (Menunggu Verifikasi Petugas)",
+          "explanation": "Setelah dikirim, pengajuan memperoleh nomor referensi unik dan berstatus \"Diajukan\". Halaman pelacakan menampilkan timeline approval yang dimulai dari antrian verifikasi Petugas Desa (Level 1).",
+          "role": "warga"
+        },
+        {
+          "file": "044_SKTM_04_petugas_antrian.png",
+          "caption": "Antrian Verifikasi Petugas Desa (Level 1) — Surat Keterangan Tidak Mampu",
+          "explanation": "Permohonan Surat Keterangan Tidak Mampu tampil pada antrian Verifikasi Petugas Desa (Level 1). Tabel menampilkan identitas pemohon, jenis surat, status terkini, dan tombol Keputusan yang berisi opsi Setujui, Minta Revisi, atau Tolak.",
+          "role": "petugas"
+        },
+        {
+          "file": "045_SKTM_05_petugas_detail.png",
+          "caption": "Detail Permohonan pada Verifikasi Petugas Desa (Level 1) — Surat Keterangan Tidak Mampu",
+          "explanation": "Verifikasi Petugas Desa (Level 1) memeriksa rincian permohonan: ringkasan status, data pemohon, isian formulir, berkas lampiran persyaratan, dan riwayat approval sebelumnya sebelum mengambil keputusan.",
+          "role": "petugas"
+        },
+        {
+          "file": "046_SKTM_06_petugas_modal.png",
+          "caption": "Modal Keputusan Setujui — Verifikasi Petugas Desa (Level 1)",
+          "explanation": "Verifikasi Petugas Desa (Level 1) memberikan keputusan melalui modal persetujuan beserta catatan. Setelah disetujui, permohonan otomatis diteruskan ke tahap approval berikutnya.",
+          "role": "petugas"
+        },
+        {
+          "file": "047_SKTM_07_petugas_hasil.png",
+          "caption": "Hasil Keputusan Verifikasi Petugas Desa (Level 1) — Surat Keterangan Tidak Mampu",
+          "explanation": "Keputusan tersimpan dan notifikasi keberhasilan muncul. Status pengajuan berpindah ke tahap berikutnya sesuai konfigurasi level approval jenis surat ini.",
+          "role": "petugas"
+        },
+        {
+          "file": "048_SKTM_05_status_2.png",
+          "caption": "Pelacakan Status setelah Level 1 — Surat Keterangan Tidak Mampu",
+          "explanation": "Timeline pada portal warga diperbarui secara real-time: tahap level sebelumnya selesai dan pengajuan kini menunggu keputusan pada level berikutnya (Level 2).",
+          "role": "warga"
+        },
+        {
+          "file": "049_SKTM_04_sekdes_antrian.png",
+          "caption": "Antrian Persetujuan Sekretaris Desa (Level 2) — Surat Keterangan Tidak Mampu",
+          "explanation": "Permohonan Surat Keterangan Tidak Mampu tampil pada antrian Persetujuan Sekretaris Desa (Level 2). Tabel menampilkan identitas pemohon, jenis surat, status terkini, dan tombol Keputusan yang berisi opsi Setujui, Minta Revisi, atau Tolak.",
+          "role": "sekdes"
+        },
+        {
+          "file": "050_SKTM_05_sekdes_detail.png",
+          "caption": "Detail Permohonan pada Persetujuan Sekretaris Desa (Level 2) — Surat Keterangan Tidak Mampu",
+          "explanation": "Persetujuan Sekretaris Desa (Level 2) memeriksa rincian permohonan: ringkasan status, data pemohon, isian formulir, berkas lampiran persyaratan, dan riwayat approval sebelumnya sebelum mengambil keputusan.",
+          "role": "sekdes"
+        },
+        {
+          "file": "051_SKTM_06_sekdes_modal.png",
+          "caption": "Modal Keputusan Setujui — Persetujuan Sekretaris Desa (Level 2)",
+          "explanation": "Persetujuan Sekretaris Desa (Level 2) memberikan keputusan melalui modal persetujuan beserta catatan. Persetujuan pada level ini sekaligus menandatangani dokumen secara elektronik (TTE) dan menerbitkan surat resmi.",
+          "role": "sekdes"
+        },
+        {
+          "file": "052_SKTM_07_sekdes_hasil.png",
+          "caption": "Hasil Keputusan Persetujuan Sekretaris Desa (Level 2) — Surat Keterangan Tidak Mampu",
+          "explanation": "Keputusan final tersimpan, surat resmi diterbitkan, dan status pengajuan berubah menjadi Selesai (Surat Terbit). Notifikasi WhatsApp dikirim ke warga.",
+          "role": "sekdes"
+        },
+        {
+          "file": "053_SKTM_08_status_selesai.png",
+          "caption": "Pelacakan Status setelah Persetujuan Final — Surat Keterangan Tidak Mampu",
+          "explanation": "Seluruh tahap approval selesai. Portal warga menampilkan banner \"Surat Telah Terbit & TTE Terverifikasi\" beserta tautan unduh PDF resmi melalui signed URL, serta riwayat catatan persetujuan dari setiap level.",
+          "role": "warga"
+        },
+        {
+          "file": "054_SKTM_09_surat_terbit.png",
+          "caption": "Arsip Surat Terbit — Surat Keterangan Tidak Mampu",
+          "explanation": "Surat Surat Keterangan Tidak Mampu yang telah disetujui penuh muncul pada arsip \"Surat Terbit\" milik warga, lengkap dengan nomor surat resmi dan token verifikasi TTE. Dokumen PDF dapat diunduh kapan saja melalui tautan aman (signed URL).",
+          "role": "warga"
+        },
+        {
+          "file": "055_SKTM_10_verifikasi_tte.png",
+          "caption": "Verifikasi Keabsahan TTE Publik — Surat Keterangan Tidak Mampu",
+          "explanation": "QR Code pada dokumen surat mengarahkan pihak penerima surat ke halaman verifikasi publik ini. Halaman membuktikan keaslian dokumen: nomor surat, tanggal terbit, identitas pemohon, serta pengesahan pejabat desa secara elektronik. Dokumen disahkan secara elektronik oleh Sekretaris Desa Karduluk selaku approver pada level akhir (Level 2).",
+          "role": "publik"
+        }
+      ]
+    },
+    {
+      "kode": "PENGANTAR_KTP",
+      "nama": "Surat Pengantar KTP",
+      "level": 1,
+      "tte": false,
+      "estimasi": 1,
+      "persyaratan": [
+        "Fotokopi Kartu Keluarga",
+        "Pas foto"
+      ],
+      "screenshots": [
+        {
+          "file": "056_PENGANTAR_KTP_01_formulir.png",
+          "caption": "Formulir Pengajuan Surat Pengantar KTP (Terisi)",
+          "explanation": "Warga mengisi formulir permohonan Surat Pengantar KTP secara digital. Sistem menampilkan kolom isian sesuai konfigurasi jenis surat, daftar dokumen persyaratan (Fotokopi Kartu Keluarga, Pas foto), serta area unggah lampiran pendukung berformat PDF/JPG/PNG maksimal 2 MB per berkas.",
+          "role": "warga"
+        },
+        {
+          "file": "057_PENGANTAR_KTP_02_pratinjau.png",
+          "caption": "Pratinjau & Konfirmasi Permohonan Surat Pengantar KTP",
+          "explanation": "Sebelum dikirim, warga meninjau ringkasan seluruh data formulir beserta jumlah lampiran yang berhasil diunggah untuk memastikan tidak ada data yang keliru.",
+          "role": "warga"
+        },
+        {
+          "file": "058_PENGANTAR_KTP_03_status_awal.png",
+          "caption": "Status Awal Pengajuan Surat Pengantar KTP (Menunggu Verifikasi Petugas)",
+          "explanation": "Setelah dikirim, pengajuan memperoleh nomor referensi unik dan berstatus \"Diajukan\". Halaman pelacakan menampilkan timeline approval yang dimulai dari antrian verifikasi Petugas Desa (Level 1).",
+          "role": "warga"
+        },
+        {
+          "file": "059_PENGANTAR_KTP_04_petugas_antrian.png",
+          "caption": "Antrian Verifikasi Petugas Desa (Level 1) — Surat Pengantar KTP",
+          "explanation": "Permohonan Surat Pengantar KTP tampil pada antrian Verifikasi Petugas Desa (Level 1). Tabel menampilkan identitas pemohon, jenis surat, status terkini, dan tombol Keputusan yang berisi opsi Setujui, Minta Revisi, atau Tolak.",
+          "role": "petugas"
+        },
+        {
+          "file": "060_PENGANTAR_KTP_05_petugas_detail.png",
+          "caption": "Detail Permohonan pada Verifikasi Petugas Desa (Level 1) — Surat Pengantar KTP",
+          "explanation": "Verifikasi Petugas Desa (Level 1) memeriksa rincian permohonan: ringkasan status, data pemohon, isian formulir, berkas lampiran persyaratan, dan riwayat approval sebelumnya sebelum mengambil keputusan.",
+          "role": "petugas"
+        },
+        {
+          "file": "061_PENGANTAR_KTP_06_petugas_modal.png",
+          "caption": "Modal Keputusan Setujui — Verifikasi Petugas Desa (Level 1)",
+          "explanation": "Verifikasi Petugas Desa (Level 1) memberikan keputusan melalui modal persetujuan beserta catatan. Setelah disetujui, permohonan otomatis diteruskan ke tahap approval berikutnya.",
+          "role": "petugas"
+        },
+        {
+          "file": "062_PENGANTAR_KTP_07_petugas_hasil.png",
+          "caption": "Hasil Keputusan Verifikasi Petugas Desa (Level 1) — Surat Pengantar KTP",
+          "explanation": "Keputusan final tersimpan, surat resmi diterbitkan, dan status pengajuan berubah menjadi Selesai (Surat Terbit). Notifikasi WhatsApp dikirim ke warga.",
+          "role": "petugas"
+        },
+        {
+          "file": "063_PENGANTAR_KTP_08_status_selesai.png",
+          "caption": "Pelacakan Status setelah Persetujuan Final — Surat Pengantar KTP",
+          "explanation": "Seluruh tahap approval selesai. Portal warga menampilkan banner \"Surat Telah Terbit & TTE Terverifikasi\" beserta tautan unduh PDF resmi melalui signed URL, serta riwayat catatan persetujuan dari setiap level.",
+          "role": "warga"
+        },
+        {
+          "file": "064_PENGANTAR_KTP_09_surat_terbit.png",
+          "caption": "Arsip Surat Terbit — Surat Pengantar KTP",
+          "explanation": "Surat Surat Pengantar KTP yang telah disetujui penuh muncul pada arsip \"Surat Terbit\" milik warga, lengkap dengan nomor surat resmi. Dokumen PDF dapat diunduh kapan saja melalui tautan aman (signed URL).",
+          "role": "warga"
+        },
+        {
+          "file": "065_PENGANTAR_KTP_10_verifikasi_tte.png",
+          "caption": "Verifikasi Keabsahan TTE Publik — Surat Pengantar KTP",
+          "explanation": "QR Code pada dokumen surat mengarahkan pihak penerima surat ke halaman verifikasi publik ini. Halaman membuktikan keaslian dokumen: nomor surat, tanggal terbit, identitas pemohon, serta pengesahan pejabat desa secara elektronik. Karena hanya melalui satu tingkat persetujuan (Level 1), pengesahan dilakukan oleh Petugas Desa atas nama Kepala Desa Karduluk.",
+          "role": "publik"
+        }
+      ]
+    },
+    {
+      "kode": "PENGANTAR_KK",
+      "nama": "Surat Pengantar KK",
+      "level": 1,
+      "tte": false,
+      "estimasi": 1,
+      "persyaratan": [
+        "Fotokopi KTP",
+        "Fotokopi KK lama (jika ada)"
+      ],
+      "screenshots": [
+        {
+          "file": "066_PENGANTAR_KK_01_formulir.png",
+          "caption": "Formulir Pengajuan Surat Pengantar KK (Terisi)",
+          "explanation": "Warga mengisi formulir permohonan Surat Pengantar KK secara digital. Sistem menampilkan kolom isian sesuai konfigurasi jenis surat, daftar dokumen persyaratan (Fotokopi KTP, Fotokopi KK lama (jika ada)), serta area unggah lampiran pendukung berformat PDF/JPG/PNG maksimal 2 MB per berkas.",
+          "role": "warga"
+        },
+        {
+          "file": "067_PENGANTAR_KK_02_pratinjau.png",
+          "caption": "Pratinjau & Konfirmasi Permohonan Surat Pengantar KK",
+          "explanation": "Sebelum dikirim, warga meninjau ringkasan seluruh data formulir beserta jumlah lampiran yang berhasil diunggah untuk memastikan tidak ada data yang keliru.",
+          "role": "warga"
+        },
+        {
+          "file": "068_PENGANTAR_KK_03_status_awal.png",
+          "caption": "Status Awal Pengajuan Surat Pengantar KK (Menunggu Verifikasi Petugas)",
+          "explanation": "Setelah dikirim, pengajuan memperoleh nomor referensi unik dan berstatus \"Diajukan\". Halaman pelacakan menampilkan timeline approval yang dimulai dari antrian verifikasi Petugas Desa (Level 1).",
+          "role": "warga"
+        },
+        {
+          "file": "069_PENGANTAR_KK_04_petugas_antrian.png",
+          "caption": "Antrian Verifikasi Petugas Desa (Level 1) — Surat Pengantar KK",
+          "explanation": "Permohonan Surat Pengantar KK tampil pada antrian Verifikasi Petugas Desa (Level 1). Tabel menampilkan identitas pemohon, jenis surat, status terkini, dan tombol Keputusan yang berisi opsi Setujui, Minta Revisi, atau Tolak.",
+          "role": "petugas"
+        },
+        {
+          "file": "070_PENGANTAR_KK_05_petugas_detail.png",
+          "caption": "Detail Permohonan pada Verifikasi Petugas Desa (Level 1) — Surat Pengantar KK",
+          "explanation": "Verifikasi Petugas Desa (Level 1) memeriksa rincian permohonan: ringkasan status, data pemohon, isian formulir, berkas lampiran persyaratan, dan riwayat approval sebelumnya sebelum mengambil keputusan.",
+          "role": "petugas"
+        },
+        {
+          "file": "071_PENGANTAR_KK_06_petugas_modal.png",
+          "caption": "Modal Keputusan Setujui — Verifikasi Petugas Desa (Level 1)",
+          "explanation": "Verifikasi Petugas Desa (Level 1) memberikan keputusan melalui modal persetujuan beserta catatan. Setelah disetujui, permohonan otomatis diteruskan ke tahap approval berikutnya.",
+          "role": "petugas"
+        },
+        {
+          "file": "072_PENGANTAR_KK_07_petugas_hasil.png",
+          "caption": "Hasil Keputusan Verifikasi Petugas Desa (Level 1) — Surat Pengantar KK",
+          "explanation": "Keputusan final tersimpan, surat resmi diterbitkan, dan status pengajuan berubah menjadi Selesai (Surat Terbit). Notifikasi WhatsApp dikirim ke warga.",
+          "role": "petugas"
+        },
+        {
+          "file": "073_PENGANTAR_KK_08_status_selesai.png",
+          "caption": "Pelacakan Status setelah Persetujuan Final — Surat Pengantar KK",
+          "explanation": "Seluruh tahap approval selesai. Portal warga menampilkan banner \"Surat Telah Terbit & TTE Terverifikasi\" beserta tautan unduh PDF resmi melalui signed URL, serta riwayat catatan persetujuan dari setiap level.",
+          "role": "warga"
+        },
+        {
+          "file": "074_PENGANTAR_KK_09_surat_terbit.png",
+          "caption": "Arsip Surat Terbit — Surat Pengantar KK",
+          "explanation": "Surat Surat Pengantar KK yang telah disetujui penuh muncul pada arsip \"Surat Terbit\" milik warga, lengkap dengan nomor surat resmi. Dokumen PDF dapat diunduh kapan saja melalui tautan aman (signed URL).",
+          "role": "warga"
+        },
+        {
+          "file": "075_PENGANTAR_KK_10_verifikasi_tte.png",
+          "caption": "Verifikasi Keabsahan TTE Publik — Surat Pengantar KK",
+          "explanation": "QR Code pada dokumen surat mengarahkan pihak penerima surat ke halaman verifikasi publik ini. Halaman membuktikan keaslian dokumen: nomor surat, tanggal terbit, identitas pemohon, serta pengesahan pejabat desa secara elektronik. Karena hanya melalui satu tingkat persetujuan (Level 1), pengesahan dilakukan oleh Petugas Desa atas nama Kepala Desa Karduluk.",
+          "role": "publik"
+        }
+      ]
+    },
+    {
+      "kode": "KELAHIRAN",
+      "nama": "Surat Keterangan Kelahiran",
+      "level": 3,
+      "tte": true,
+      "estimasi": 2,
+      "persyaratan": [
+        "Fotokopi KTP orang tua",
+        "Fotokopi Kartu Keluarga",
+        "Surat keterangan lahir dari bidan/RS"
+      ],
+      "screenshots": [
+        {
+          "file": "076_KELAHIRAN_01_formulir.png",
+          "caption": "Formulir Pengajuan Surat Keterangan Kelahiran (Terisi)",
+          "explanation": "Warga mengisi formulir permohonan Surat Keterangan Kelahiran secara digital. Sistem menampilkan kolom isian sesuai konfigurasi jenis surat, daftar dokumen persyaratan (Fotokopi KTP orang tua, Fotokopi Kartu Keluarga, Surat keterangan lahir dari bidan/RS), serta area unggah lampiran pendukung berformat PDF/JPG/PNG maksimal 2 MB per berkas.",
+          "role": "warga"
+        },
+        {
+          "file": "077_KELAHIRAN_02_pratinjau.png",
+          "caption": "Pratinjau & Konfirmasi Permohonan Surat Keterangan Kelahiran",
+          "explanation": "Sebelum dikirim, warga meninjau ringkasan seluruh data formulir beserta jumlah lampiran yang berhasil diunggah untuk memastikan tidak ada data yang keliru.",
+          "role": "warga"
+        },
+        {
+          "file": "078_KELAHIRAN_03_status_awal.png",
+          "caption": "Status Awal Pengajuan Surat Keterangan Kelahiran (Menunggu Verifikasi Petugas)",
+          "explanation": "Setelah dikirim, pengajuan memperoleh nomor referensi unik dan berstatus \"Diajukan\". Halaman pelacakan menampilkan timeline approval yang dimulai dari antrian verifikasi Petugas Desa (Level 1).",
+          "role": "warga"
+        },
+        {
+          "file": "079_KELAHIRAN_04_petugas_antrian.png",
+          "caption": "Antrian Verifikasi Petugas Desa (Level 1) — Surat Keterangan Kelahiran",
+          "explanation": "Permohonan Surat Keterangan Kelahiran tampil pada antrian Verifikasi Petugas Desa (Level 1). Tabel menampilkan identitas pemohon, jenis surat, status terkini, dan tombol Keputusan yang berisi opsi Setujui, Minta Revisi, atau Tolak.",
+          "role": "petugas"
+        },
+        {
+          "file": "080_KELAHIRAN_05_petugas_detail.png",
+          "caption": "Detail Permohonan pada Verifikasi Petugas Desa (Level 1) — Surat Keterangan Kelahiran",
+          "explanation": "Verifikasi Petugas Desa (Level 1) memeriksa rincian permohonan: ringkasan status, data pemohon, isian formulir, berkas lampiran persyaratan, dan riwayat approval sebelumnya sebelum mengambil keputusan.",
+          "role": "petugas"
+        },
+        {
+          "file": "081_KELAHIRAN_06_petugas_modal.png",
+          "caption": "Modal Keputusan Setujui — Verifikasi Petugas Desa (Level 1)",
+          "explanation": "Verifikasi Petugas Desa (Level 1) memberikan keputusan melalui modal persetujuan beserta catatan. Setelah disetujui, permohonan otomatis diteruskan ke tahap approval berikutnya.",
+          "role": "petugas"
+        },
+        {
+          "file": "082_KELAHIRAN_07_petugas_hasil.png",
+          "caption": "Hasil Keputusan Verifikasi Petugas Desa (Level 1) — Surat Keterangan Kelahiran",
+          "explanation": "Keputusan tersimpan dan notifikasi keberhasilan muncul. Status pengajuan berpindah ke tahap berikutnya sesuai konfigurasi level approval jenis surat ini.",
+          "role": "petugas"
+        },
+        {
+          "file": "083_KELAHIRAN_05_status_2.png",
+          "caption": "Pelacakan Status setelah Level 1 — Surat Keterangan Kelahiran",
+          "explanation": "Timeline pada portal warga diperbarui secara real-time: tahap level sebelumnya selesai dan pengajuan kini menunggu keputusan pada level berikutnya (Level 2).",
+          "role": "warga"
+        },
+        {
+          "file": "084_KELAHIRAN_04_sekdes_antrian.png",
+          "caption": "Antrian Persetujuan Sekretaris Desa (Level 2) — Surat Keterangan Kelahiran",
+          "explanation": "Permohonan Surat Keterangan Kelahiran tampil pada antrian Persetujuan Sekretaris Desa (Level 2). Tabel menampilkan identitas pemohon, jenis surat, status terkini, dan tombol Keputusan yang berisi opsi Setujui, Minta Revisi, atau Tolak.",
+          "role": "sekdes"
+        },
+        {
+          "file": "085_KELAHIRAN_05_sekdes_detail.png",
+          "caption": "Detail Permohonan pada Persetujuan Sekretaris Desa (Level 2) — Surat Keterangan Kelahiran",
+          "explanation": "Persetujuan Sekretaris Desa (Level 2) memeriksa rincian permohonan: ringkasan status, data pemohon, isian formulir, berkas lampiran persyaratan, dan riwayat approval sebelumnya sebelum mengambil keputusan.",
+          "role": "sekdes"
+        },
+        {
+          "file": "086_KELAHIRAN_06_sekdes_modal.png",
+          "caption": "Modal Keputusan Setujui — Persetujuan Sekretaris Desa (Level 2)",
+          "explanation": "Persetujuan Sekretaris Desa (Level 2) memberikan keputusan melalui modal persetujuan beserta catatan. Setelah disetujui, permohonan otomatis diteruskan ke tahap approval berikutnya.",
+          "role": "sekdes"
+        },
+        {
+          "file": "087_KELAHIRAN_07_sekdes_hasil.png",
+          "caption": "Hasil Keputusan Persetujuan Sekretaris Desa (Level 2) — Surat Keterangan Kelahiran",
+          "explanation": "Keputusan tersimpan dan notifikasi keberhasilan muncul. Status pengajuan berpindah ke tahap berikutnya sesuai konfigurasi level approval jenis surat ini.",
+          "role": "sekdes"
+        },
+        {
+          "file": "088_KELAHIRAN_05_status_3.png",
+          "caption": "Pelacakan Status setelah Level 2 — Surat Keterangan Kelahiran",
+          "explanation": "Timeline pada portal warga diperbarui secara real-time: tahap level sebelumnya selesai dan pengajuan kini menunggu keputusan pada level berikutnya (Level 3).",
+          "role": "warga"
+        },
+        {
+          "file": "089_KELAHIRAN_04_kades_antrian.png",
+          "caption": "Antrian Persetujuan Kepala Desa (Level 3 & TTE) — Surat Keterangan Kelahiran",
+          "explanation": "Permohonan Surat Keterangan Kelahiran tampil pada antrian Persetujuan Kepala Desa (Level 3 & TTE). Tabel menampilkan identitas pemohon, jenis surat, status terkini, dan tombol Keputusan yang berisi opsi Setujui, Minta Revisi, atau Tolak.",
+          "role": "kades"
+        },
+        {
+          "file": "090_KELAHIRAN_05_kades_detail.png",
+          "caption": "Detail Permohonan pada Persetujuan Kepala Desa (Level 3 & TTE) — Surat Keterangan Kelahiran",
+          "explanation": "Persetujuan Kepala Desa (Level 3 & TTE) memeriksa rincian permohonan: ringkasan status, data pemohon, isian formulir, berkas lampiran persyaratan, dan riwayat approval sebelumnya sebelum mengambil keputusan.",
+          "role": "kades"
+        },
+        {
+          "file": "091_KELAHIRAN_06_kades_modal.png",
+          "caption": "Modal Keputusan Setujui — Persetujuan Kepala Desa (Level 3 & TTE)",
+          "explanation": "Persetujuan Kepala Desa (Level 3 & TTE) memberikan keputusan melalui modal persetujuan beserta catatan. Persetujuan pada level ini sekaligus menandatangani dokumen secara elektronik (TTE) dan menerbitkan surat resmi.",
+          "role": "kades"
+        },
+        {
+          "file": "092_KELAHIRAN_07_kades_hasil.png",
+          "caption": "Hasil Keputusan Persetujuan Kepala Desa (Level 3 & TTE) — Surat Keterangan Kelahiran",
+          "explanation": "Keputusan final tersimpan, surat resmi diterbitkan, dan status pengajuan berubah menjadi Selesai (Surat Terbit). Notifikasi WhatsApp dikirim ke warga.",
+          "role": "kades"
+        },
+        {
+          "file": "093_KELAHIRAN_08_status_selesai.png",
+          "caption": "Pelacakan Status setelah Persetujuan Final — Surat Keterangan Kelahiran",
+          "explanation": "Seluruh tahap approval selesai. Portal warga menampilkan banner \"Surat Telah Terbit & TTE Terverifikasi\" beserta tautan unduh PDF resmi melalui signed URL, serta riwayat catatan persetujuan dari setiap level.",
+          "role": "warga"
+        },
+        {
+          "file": "094_KELAHIRAN_09_surat_terbit.png",
+          "caption": "Arsip Surat Terbit — Surat Keterangan Kelahiran",
+          "explanation": "Surat Surat Keterangan Kelahiran yang telah disetujui penuh muncul pada arsip \"Surat Terbit\" milik warga, lengkap dengan nomor surat resmi dan token verifikasi TTE. Dokumen PDF dapat diunduh kapan saja melalui tautan aman (signed URL).",
+          "role": "warga"
+        },
+        {
+          "file": "095_KELAHIRAN_10_verifikasi_tte.png",
+          "caption": "Verifikasi Keabsahan TTE Publik — Surat Keterangan Kelahiran",
+          "explanation": "QR Code pada dokumen surat mengarahkan pihak penerima surat ke halaman verifikasi publik ini. Halaman membuktikan keaslian dokumen: nomor surat, tanggal terbit, identitas pemohon, serta pengesahan pejabat desa secara elektronik. Dokumen ditandatangani secara elektronik oleh Kepala Desa Karduluk selaku approver pada level akhir (Level 3).",
+          "role": "publik"
+        }
+      ]
+    },
+    {
+      "kode": "KEMATIAN",
+      "nama": "Surat Keterangan Kematian",
+      "level": 3,
+      "tte": true,
+      "estimasi": 2,
+      "persyaratan": [
+        "Fotokopi KTP almarhum/ah",
+        "Fotokopi Kartu Keluarga",
+        "Surat keterangan kematian dari RS (jika ada)"
+      ],
+      "screenshots": [
+        {
+          "file": "096_KEMATIAN_01_formulir.png",
+          "caption": "Formulir Pengajuan Surat Keterangan Kematian (Terisi)",
+          "explanation": "Warga mengisi formulir permohonan Surat Keterangan Kematian secara digital. Sistem menampilkan kolom isian sesuai konfigurasi jenis surat, daftar dokumen persyaratan (Fotokopi KTP almarhum/ah, Fotokopi Kartu Keluarga, Surat keterangan kematian dari RS (jika ada)), serta area unggah lampiran pendukung berformat PDF/JPG/PNG maksimal 2 MB per berkas.",
+          "role": "warga"
+        },
+        {
+          "file": "097_KEMATIAN_02_pratinjau.png",
+          "caption": "Pratinjau & Konfirmasi Permohonan Surat Keterangan Kematian",
+          "explanation": "Sebelum dikirim, warga meninjau ringkasan seluruh data formulir beserta jumlah lampiran yang berhasil diunggah untuk memastikan tidak ada data yang keliru.",
+          "role": "warga"
+        },
+        {
+          "file": "098_KEMATIAN_03_status_awal.png",
+          "caption": "Status Awal Pengajuan Surat Keterangan Kematian (Menunggu Verifikasi Petugas)",
+          "explanation": "Setelah dikirim, pengajuan memperoleh nomor referensi unik dan berstatus \"Diajukan\". Halaman pelacakan menampilkan timeline approval yang dimulai dari antrian verifikasi Petugas Desa (Level 1).",
+          "role": "warga"
+        },
+        {
+          "file": "099_KEMATIAN_04_petugas_antrian.png",
+          "caption": "Antrian Verifikasi Petugas Desa (Level 1) — Surat Keterangan Kematian",
+          "explanation": "Permohonan Surat Keterangan Kematian tampil pada antrian Verifikasi Petugas Desa (Level 1). Tabel menampilkan identitas pemohon, jenis surat, status terkini, dan tombol Keputusan yang berisi opsi Setujui, Minta Revisi, atau Tolak.",
+          "role": "petugas"
+        },
+        {
+          "file": "100_KEMATIAN_05_petugas_detail.png",
+          "caption": "Detail Permohonan pada Verifikasi Petugas Desa (Level 1) — Surat Keterangan Kematian",
+          "explanation": "Verifikasi Petugas Desa (Level 1) memeriksa rincian permohonan: ringkasan status, data pemohon, isian formulir, berkas lampiran persyaratan, dan riwayat approval sebelumnya sebelum mengambil keputusan.",
+          "role": "petugas"
+        },
+        {
+          "file": "101_KEMATIAN_06_petugas_modal.png",
+          "caption": "Modal Keputusan Setujui — Verifikasi Petugas Desa (Level 1)",
+          "explanation": "Verifikasi Petugas Desa (Level 1) memberikan keputusan melalui modal persetujuan beserta catatan. Setelah disetujui, permohonan otomatis diteruskan ke tahap approval berikutnya.",
+          "role": "petugas"
+        },
+        {
+          "file": "102_KEMATIAN_07_petugas_hasil.png",
+          "caption": "Hasil Keputusan Verifikasi Petugas Desa (Level 1) — Surat Keterangan Kematian",
+          "explanation": "Keputusan tersimpan dan notifikasi keberhasilan muncul. Status pengajuan berpindah ke tahap berikutnya sesuai konfigurasi level approval jenis surat ini.",
+          "role": "petugas"
+        },
+        {
+          "file": "103_KEMATIAN_05_status_2.png",
+          "caption": "Pelacakan Status setelah Level 1 — Surat Keterangan Kematian",
+          "explanation": "Timeline pada portal warga diperbarui secara real-time: tahap level sebelumnya selesai dan pengajuan kini menunggu keputusan pada level berikutnya (Level 2).",
+          "role": "warga"
+        },
+        {
+          "file": "104_KEMATIAN_04_sekdes_antrian.png",
+          "caption": "Antrian Persetujuan Sekretaris Desa (Level 2) — Surat Keterangan Kematian",
+          "explanation": "Permohonan Surat Keterangan Kematian tampil pada antrian Persetujuan Sekretaris Desa (Level 2). Tabel menampilkan identitas pemohon, jenis surat, status terkini, dan tombol Keputusan yang berisi opsi Setujui, Minta Revisi, atau Tolak.",
+          "role": "sekdes"
+        },
+        {
+          "file": "105_KEMATIAN_05_sekdes_detail.png",
+          "caption": "Detail Permohonan pada Persetujuan Sekretaris Desa (Level 2) — Surat Keterangan Kematian",
+          "explanation": "Persetujuan Sekretaris Desa (Level 2) memeriksa rincian permohonan: ringkasan status, data pemohon, isian formulir, berkas lampiran persyaratan, dan riwayat approval sebelumnya sebelum mengambil keputusan.",
+          "role": "sekdes"
+        },
+        {
+          "file": "106_KEMATIAN_06_sekdes_modal.png",
+          "caption": "Modal Keputusan Setujui — Persetujuan Sekretaris Desa (Level 2)",
+          "explanation": "Persetujuan Sekretaris Desa (Level 2) memberikan keputusan melalui modal persetujuan beserta catatan. Setelah disetujui, permohonan otomatis diteruskan ke tahap approval berikutnya.",
+          "role": "sekdes"
+        },
+        {
+          "file": "107_KEMATIAN_07_sekdes_hasil.png",
+          "caption": "Hasil Keputusan Persetujuan Sekretaris Desa (Level 2) — Surat Keterangan Kematian",
+          "explanation": "Keputusan tersimpan dan notifikasi keberhasilan muncul. Status pengajuan berpindah ke tahap berikutnya sesuai konfigurasi level approval jenis surat ini.",
+          "role": "sekdes"
+        },
+        {
+          "file": "108_KEMATIAN_05_status_3.png",
+          "caption": "Pelacakan Status setelah Level 2 — Surat Keterangan Kematian",
+          "explanation": "Timeline pada portal warga diperbarui secara real-time: tahap level sebelumnya selesai dan pengajuan kini menunggu keputusan pada level berikutnya (Level 3).",
+          "role": "warga"
+        },
+        {
+          "file": "109_KEMATIAN_04_kades_antrian.png",
+          "caption": "Antrian Persetujuan Kepala Desa (Level 3 & TTE) — Surat Keterangan Kematian",
+          "explanation": "Permohonan Surat Keterangan Kematian tampil pada antrian Persetujuan Kepala Desa (Level 3 & TTE). Tabel menampilkan identitas pemohon, jenis surat, status terkini, dan tombol Keputusan yang berisi opsi Setujui, Minta Revisi, atau Tolak.",
+          "role": "kades"
+        },
+        {
+          "file": "110_KEMATIAN_05_kades_detail.png",
+          "caption": "Detail Permohonan pada Persetujuan Kepala Desa (Level 3 & TTE) — Surat Keterangan Kematian",
+          "explanation": "Persetujuan Kepala Desa (Level 3 & TTE) memeriksa rincian permohonan: ringkasan status, data pemohon, isian formulir, berkas lampiran persyaratan, dan riwayat approval sebelumnya sebelum mengambil keputusan.",
+          "role": "kades"
+        },
+        {
+          "file": "111_KEMATIAN_06_kades_modal.png",
+          "caption": "Modal Keputusan Setujui — Persetujuan Kepala Desa (Level 3 & TTE)",
+          "explanation": "Persetujuan Kepala Desa (Level 3 & TTE) memberikan keputusan melalui modal persetujuan beserta catatan. Persetujuan pada level ini sekaligus menandatangani dokumen secara elektronik (TTE) dan menerbitkan surat resmi.",
+          "role": "kades"
+        },
+        {
+          "file": "112_KEMATIAN_07_kades_hasil.png",
+          "caption": "Hasil Keputusan Persetujuan Kepala Desa (Level 3 & TTE) — Surat Keterangan Kematian",
+          "explanation": "Keputusan final tersimpan, surat resmi diterbitkan, dan status pengajuan berubah menjadi Selesai (Surat Terbit). Notifikasi WhatsApp dikirim ke warga.",
+          "role": "kades"
+        },
+        {
+          "file": "113_KEMATIAN_08_status_selesai.png",
+          "caption": "Pelacakan Status setelah Persetujuan Final — Surat Keterangan Kematian",
+          "explanation": "Seluruh tahap approval selesai. Portal warga menampilkan banner \"Surat Telah Terbit & TTE Terverifikasi\" beserta tautan unduh PDF resmi melalui signed URL, serta riwayat catatan persetujuan dari setiap level.",
+          "role": "warga"
+        },
+        {
+          "file": "114_KEMATIAN_09_surat_terbit.png",
+          "caption": "Arsip Surat Terbit — Surat Keterangan Kematian",
+          "explanation": "Surat Surat Keterangan Kematian yang telah disetujui penuh muncul pada arsip \"Surat Terbit\" milik warga, lengkap dengan nomor surat resmi dan token verifikasi TTE. Dokumen PDF dapat diunduh kapan saja melalui tautan aman (signed URL).",
+          "role": "warga"
+        },
+        {
+          "file": "115_KEMATIAN_10_verifikasi_tte.png",
+          "caption": "Verifikasi Keabsahan TTE Publik — Surat Keterangan Kematian",
+          "explanation": "QR Code pada dokumen surat mengarahkan pihak penerima surat ke halaman verifikasi publik ini. Halaman membuktikan keaslian dokumen: nomor surat, tanggal terbit, identitas pemohon, serta pengesahan pejabat desa secara elektronik. Dokumen ditandatangani secara elektronik oleh Kepala Desa Karduluk selaku approver pada level akhir (Level 3).",
+          "role": "publik"
+        }
+      ]
+    }
+  ]
+}

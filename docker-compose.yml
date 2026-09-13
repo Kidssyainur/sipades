@@ -13,21 +13,53 @@ services:
       - DB_DATABASE=sipades
       - DB_USERNAME=sipades
       - DB_PASSWORD=sipades_secret
-      - WHATSAPP_WEB_HOST=127.0.0.1
+      - WHATSAPP_WEB_HOST=whatsapp
       - WHATSAPP_WEB_PORT=3000
       - WHATSAPP_WEB_NODE_BINARY=/usr/bin/node
       - WHATSAPP_WEB_NPM_BINARY=/usr/bin/npm
+      - WHATSAPP_WEB_MANAGED_EXTERNALLY=true
       - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
     volumes:
       - .:/var/www/html:z
       - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini:ro,z
       - ./docker/entrypoint.sh:/usr/local/bin/docker-entrypoint.sh:ro,z
     ports:
-      - "3000:3000"
       - "5173:5173"
     depends_on:
       db:
         condition: service_healthy
+      whatsapp:
+        condition: service_started
+    networks:
+      - sipades-net
+
+  whatsapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sipades_whatsapp
+    restart: unless-stopped
+    working_dir: /var/www/html/vendor/kstmostofa/laravel-whatsapp/sidecar
+    entrypoint: ["node"]
+    command: ["/var/www/html/vendor/kstmostofa/laravel-whatsapp/sidecar/index.js"]
+    stop_grace_period: 15s
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3000
+      - SIDECAR_TOKEN=${WHATSAPP_WEB_TOKEN:-sipades_wa_sidecar_secret_token_2026}
+      - SESSION_DIR=/var/www/html/storage/app/whatsapp-sidecar/sessions
+      - AUTO_START_SESSIONS=true
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+    volumes:
+      - .:/var/www/html:z
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -H 'Authorization: Bearer ${WHATSAPP_WEB_TOKEN:-sipades_wa_sidecar_secret_token_2026}' http://127.0.0.1:3000/health > /dev/null || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     networks:
       - sipades-net
 

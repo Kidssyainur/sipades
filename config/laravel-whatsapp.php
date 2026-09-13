@@ -63,6 +63,9 @@ return [
         'timeout' => (int) env('WHATSAPP_WEB_TIMEOUT', 60),
 
         'sidecar' => [
+            // Saat true (mis. di Docker), siklus hidup sidecar dikelola oleh
+            // proses/container lain sehingga Laravel tidak boleh spawn sendiri.
+            'managed_externally' => env('WHATSAPP_WEB_MANAGED_EXTERNALLY', false),
             'path' => env('WHATSAPP_WEB_SIDECAR_PATH', base_path('vendor/kstmostofa/laravel-whatsapp/sidecar')),
             'node_binary' => env('WHATSAPP_WEB_NODE_BINARY', 'node'),
             'npm_binary' => env('WHATSAPP_WEB_NPM_BINARY', 'npm'),

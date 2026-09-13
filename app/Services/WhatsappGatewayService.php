@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Http;
 use Kstmostofa\LaravelWhatsApp\Exceptions\SidecarException;
 use Kstmostofa\LaravelWhatsApp\Facades\WhatsApp;
 use Kstmostofa\LaravelWhatsApp\Web\SidecarManager;
@@ -72,11 +73,21 @@ class WhatsappGatewayService
                     'authenticated' => 'Autentikasi berhasil, memuat sesi...',
                     'disconnected' => 'Sesi WhatsApp terputus (Disconnected).',
                     'auth_failure' => 'Autentikasi gagal. Silakan reset/destroy sesi dan scan ulang.',
+                    'error' => 'Sidecar WhatsApp mengalami error. Coba Reset Pairing (Hapus Sesi) lalu scan ulang.',
                     default => 'Status koneksi sidecar: ' . strtoupper($status),
                 },
                 'response' => $state,
             ];
         } catch (SidecarException $e) {
+            if ($e->getCode() === 404) {
+                return [
+                    'online' => false,
+                    'status' => 'OFFLINE',
+                    'pesan' => 'Sesi WhatsApp belum dibuat. Klik "Start / Pairing QR" untuk memulai.',
+                    'response' => null,
+                ];
+            }
+
             return [
                 'online' => false,
                 'status' => 'UNREACHABLE',
@@ -108,10 +119,30 @@ class WhatsappGatewayService
     }
 
     /**
-     * Pastikan proses Node.js sidecar sudah berjalan. Jika belum, jalankan otomatis.
+     * Pastikan server sidecar HTTP sudah berjalan.
+     *
+     * Urutan pengecekan:
+     * 1. Endpoint /health dianggap sumber kebenaran — bila hidup, tidak peduli
+     *    siapa yang menjalankannya (container Docker, supervisor, dsb).
+     * 2. Bila mati dan sidecar dikelola eksternal, jangan spawn duplikat.
+     * 3. Bila mati dan dikelola Laravel, jalankan proses Node.js otomatis.
      */
     public function ensureSidecarRunning(): bool
     {
+        if ($this->isSidecarHealthy()) {
+            return true;
+        }
+
+        if (config('laravel-whatsapp.web.sidecar.managed_externally', false)) {
+            $host = config('laravel-whatsapp.web.host');
+            $port = config('laravel-whatsapp.web.port');
+
+            throw new SidecarException(
+                "Sidecar WhatsApp eksternal tidak dapat dihubungi di http://{$host}:{$port}. " .
+                'Pastikan service sidecar (mis. container `whatsapp`) berjalan.'
+            );
+        }
+
         /** @var SidecarManager $manager */
         $manager = app(SidecarManager::class);
 
@@ -119,10 +150,43 @@ class WhatsappGatewayService
             if (! $manager->isInstalled()) {
                 $manager->install();
             }
-            $manager->start();
+
+            try {
+                $manager->start();
+            } catch (\Throwable $e) {
+                // Proses lain mungkin baru saja menyalakan sidecar (race).
+                // Hanya lempar error bila endpoint benar-benar masih mati.
+                if (! $this->isSidecarHealthy()) {
+                    throw $e;
+                }
+            }
         }
 
-        return $manager->isRunning();
+        return $this->isSidecarHealthy() || $manager->isRunning();
+    }
+
+    /**
+     * Cek langsung endpoint /health sidecar (tanpa melihat PID file).
+     */
+    public function isSidecarHealthy(): bool
+    {
+        $host = (string) config('laravel-whatsapp.web.host');
+        $port = (int) config('laravel-whatsapp.web.port');
+        $token = (string) config('laravel-whatsapp.web.token');
+
+        try {
+            $request = Http::acceptJson()->timeout(3);
+
+            if ($token !== '') {
+                $request = $request->withToken($token);
+            }
+
+            $response = $request->get("http://{$host}:{$port}/health");
+
+            return $response->successful() && $response->json('ok') === true;
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     /**

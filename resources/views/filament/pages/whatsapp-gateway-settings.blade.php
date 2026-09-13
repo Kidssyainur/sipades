@@ -8,7 +8,7 @@
             <x-slot name="description">
                 Backend: whatsapp-web.js (Node.js Sidecar) &bull; Session ID: <code class="font-mono text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded">{{ $sessionId }}</code>
             </x-slot>
-            <x-slot name="headerEnd">
+            <x-slot name="afterHeader">
                 <div class="flex items-center gap-2" wire:key="status-badge-container-{{ $statusKoneksi['status'] ?? 'unknown' }}">
                     @if($statusKoneksi)
                         @php
@@ -26,6 +26,10 @@
                         @elseif($statusStr === 'initializing' || $statusStr === 'authenticated')
                             <x-filament::badge color="info" icon="heroicon-o-arrow-path">
                                 {{ strtoupper($statusStr) }}...
+                            </x-filament::badge>
+                        @elseif($statusStr === 'offline')
+                            <x-filament::badge color="gray" icon="heroicon-o-power">
+                                SESI BELUM AKTIF
                             </x-filament::badge>
                         @else
                             <x-filament::badge color="danger" icon="heroicon-o-x-circle">
@@ -74,6 +78,14 @@
                             <div class="text-sm text-emerald-900 dark:text-emerald-200 leading-relaxed">
                                 <strong class="font-bold block mb-1">WhatsApp Terhubung &amp; Ready!</strong>
                                 Perangkat WhatsApp Anda sudah aktif dan siap mengirim notifikasi. Jika Anda ingin menghubungkan nomor HP lain atau memperbarui scan QR Code, silakan klik tombol <span class="font-semibold underline">Reset Pairing (Hapus Sesi)</span> di atas.
+                            </div>
+                        </div>
+                    @elseif(($statusKoneksi['status'] ?? null) === 'OFFLINE')
+                        <div class="p-4 rounded-xl border border-sky-300 bg-sky-50/50 dark:border-sky-800 dark:bg-sky-950/30 flex items-start gap-3">
+                            <x-heroicon-o-power class="h-6 w-6 text-sky-600 dark:text-sky-400 shrink-0" style="width: 1.5rem; height: 1.5rem;" />
+                            <div class="text-sm text-sky-900 dark:text-sky-200 leading-relaxed">
+                                <strong class="font-bold block mb-1">Sesi WhatsApp Belum Berjalan</strong>
+                                Sidecar aktif, tetapi belum ada sesi untuk di-pairing. Klik <span class="font-semibold underline">Start / Pairing QR</span> untuk menampilkan QR Code.
                             </div>
                         </div>
                     @elseif($qr)

@@ -1,10 +1,11 @@
 <div class="mx-auto max-w-lg my-6">
     <div class="rounded-3xl bg-white p-8 sm:p-10 shadow-2xl shadow-slate-200/60 border border-slate-100">
         <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-lg shadow-emerald-900/30 mb-3">
-                <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                </svg>
+            <div class="inline-flex items-center justify-center h-16 w-16 overflow-hidden rounded-full bg-white shadow-lg shadow-emerald-900/20 ring-2 ring-emerald-400/50 mb-3">
+                <img src="{{ asset('assets/logo-karduluk.webp') }}"
+                     alt="Logo Desa Karduluk"
+                     class="h-full w-full object-cover"
+                     onerror="this.onerror=null;this.src='{{ asset('assets/logo-karduluk.png') }}';">
             </div>
             <h1 class="text-2xl font-extrabold text-slate-900">Registrasi Akun Warga</h1>
             <p class="mt-1 text-xs text-slate-500 font-medium">Lengkapi data NIK kependudukan Anda untuk pendaftaran akun.</p>

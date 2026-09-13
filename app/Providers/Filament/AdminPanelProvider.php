@@ -31,6 +31,9 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('SIPADES — Desa Karduluk')
+            ->brandLogo(asset('assets/logo-karduluk.png'))
+            ->brandLogoHeight('2.5rem')
+            ->favicon(asset('favicon.ico'))
             ->colors([
                 'primary' => Color::Emerald,
                 'gray' => Color::Slate,
